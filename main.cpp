@@ -14,6 +14,8 @@ enum {
 enum {
 	EMPTY, SOLID,
 	HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
+	ECOR_UP, ECOR_DOWN, ECOR_LEFT, ECOR_RIGHT,
+	SCOR_UP, SCOR_DOWN, SCOR_LEFT, SCOR_RIGHT,
 };
 
 struct TileConfig {
@@ -26,13 +28,7 @@ struct TileConfig {
 	int Fill;
 };
 
-enum {
-	TILE_A1, TILE_A2, TILE_B1, TILE_B2, TILE_B3, TILE_B4,
-	TILE_C11, TILE_C12, TILE_C13, TILE_C14, TILE_C21, TILE_C22, TILE_C23, TILE_C24,
-	NUM_TILES
-};
-
-const TileConfig tiles[NUM_TILES] = {
+const TileConfig tiles[] = {
 	{ "tiles/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,      EMPTY,      EMPTY,      EMPTY      ,   0 },
 	{ "tiles/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,      SOLID,      SOLID,      SOLID      , 100 },
 	{ "tiles/B1.png",  BEU+BSD,            EMPTY,      SOLID,      HALF_DOWN,  HALF_DOWN  ,  50 },
@@ -48,6 +44,8 @@ const TileConfig tiles[NUM_TILES] = {
 	{ "tiles/C23.png", BSD+BSR,            HALF_RIGHT, SOLID,      HALF_DOWN,  SOLID      ,  75 },
 	{ "tiles/C24.png", BSD+BSL,            HALF_LEFT,  SOLID,      SOLID,      HALF_DOWN  ,  75 },
 };
+
+enum { TILE_EMPTY=0, TILE_SOLID=1, NUM_TILES = sizeof(tiles) / sizeof(TileConfig) };
 
 bool doTilesMatchVert(const TileConfig & up, const TileConfig & down) {
 	if (up.EdgeDown == down.EdgeUp) return true;
@@ -170,7 +168,6 @@ struct Map {
 									e += 300;
 							}
 
-							//e = (Tiles[c].Fill);
 							if (best_err == -1 || e < best_err) {
 								best_tile = c;
 								best_err = e;
@@ -185,25 +182,17 @@ struct Map {
 							tiles_ok[x+y*Width] = true;
 						}
 					}
-					//printf("%s%02d%s%s%02d  ",
-					//	Cells[x+y*Width].Elevation >= 0 ? "^" : "v",
-					//	Cells[x+y*Width].TileID,
-					//	Cells[x+y*Width].Fixed ? "*" : "·",
-					//	best_err > 0 ? "e" : ( best_err < 0 ? "?" :" "),
-					//	best_err/100
-					//);
 				}
-				printf("\n");
 			}
-			printf("\nIter=%d, Changes= %d, Wrong=%d\n\n", k, changes, wrong);
+			printf("Iter=%d, Changes= %d, Wrong=%d\n", k, changes, wrong);
 			if (!changes && wrong) {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
 						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].Fixed) {
 							if (Cells[x+y*Width].Elevation >= 0) {
-								Cells[x+y*Width].TileID = TILE_A2;
+								Cells[x+y*Width].TileID = TILE_SOLID;
 							} else {
-								Cells[x+y*Width].TileID = TILE_A1;
+								Cells[x+y*Width].TileID = TILE_EMPTY;
 							}
 						}
 					}
@@ -227,35 +216,22 @@ struct Map {
 				bool r =  (Cells[ xp + y  *Width].Elevation >= 0);
 				bool u =  (Cells[ x  + yp *Width].Elevation >= 0);
 				bool d =  (Cells[ x  + ym *Width].Elevation >= 0);
-				bool ul = (Cells[ xm + yp *Width].Elevation >= 0);
-				bool ur = (Cells[ xp + yp *Width].Elevation >= 0);
-				bool dl = (Cells[ xm + ym *Width].Elevation >= 0);
-				bool dr = (Cells[ xp + ym *Width].Elevation >= 0);
 
 				if (!u && !d && !l && !r) c = false;
 				if (u && d && l && r) c = true;
 
 				Cells[x+y*Width].Fixed = false;
 				if (c & u & d & l & r) {
-					Cells[x+y*Width].TileID = TILE_A2;
+					Cells[x+y*Width].TileID = TILE_SOLID;
 					Cells[x+y*Width].Fixed = true;
 				} else if (!c & !u & !d & !l & !r) {
-					Cells[x+y*Width].TileID = TILE_A1;
+					Cells[x+y*Width].TileID = TILE_EMPTY;
 					Cells[x+y*Width].Fixed = false;
-				} else if (!c & !u & !d & l & !r & ul & !ur & dl & !dr) {
-					Cells[x+y*Width].TileID = TILE_B2;
-				} else if (!c & !u & !d & !l & r & !ul & ur & !dl & dr) {
-					Cells[x+y*Width].TileID = TILE_B4;
 				} else {
-					Cells[x+y*Width].TileID = TILE_A2;
+					Cells[x+y*Width].TileID = TILE_SOLID;
 				}
-
-				//printf("%s%2d%s ", Cells[x+y*Width].Elevation >= 0 ? "^": "v",
-				//	Cells[x+y*Width].TileID, Cells[x+y*Width].Fixed ? "+" : " ");
 			}
-			printf("\n");
 		}
-		printf("\n");
 	}
 
 	void Random() {
