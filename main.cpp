@@ -15,8 +15,16 @@ enum {
 	EMPTY, SOLID,
 	HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
 	ECOR_UP, ECOR_DOWN, ECOR_LEFT, ECOR_RIGHT,
-	SCOR_UP, SCOR_DOWN, SCOR_LEFT, SCOR_RIGHT,
+	SCOR_UP, SCOR_DOWN, SCOR_LEFT, SCOR_RIGHT
 };
+
+int HMirrorEdge(int edge) {
+	return edge;
+}
+
+int VMirrorEdge(int edge) {
+	return edge;
+}
 
 struct TileConfig {
 	const char * FileName;
@@ -29,28 +37,139 @@ struct TileConfig {
 };
 
 const TileConfig tiles[] = {
-	{ "tiles/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,      EMPTY,      EMPTY,      EMPTY      ,   0 },
-	{ "tiles/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,      SOLID,      SOLID,      SOLID      , 100 },
-	{ "tiles/B1.png",  BEU+BSD,            EMPTY,      SOLID,      HALF_DOWN,  HALF_DOWN  ,  50 },
-	{ "tiles/B2.png",  BER+BSL,            HALF_LEFT,  HALF_LEFT,  SOLID,      EMPTY      ,  50 },
-	{ "tiles/B3.png",  BED+BSU,            SOLID,      EMPTY,      HALF_UP,    HALF_UP    ,  50 },
-	{ "tiles/B4.png",  BEL+BSR,            HALF_RIGHT, HALF_RIGHT, EMPTY,      SOLID      ,  50 },
-	{ "tiles/C11.png", BEU+BEL,            EMPTY,      HALF_RIGHT, EMPTY,      HALF_DOWN  ,  25 },
-	{ "tiles/C12.png", BEU+BER,            EMPTY,      HALF_LEFT,  HALF_DOWN,  EMPTY      ,  25 },
-	{ "tiles/C13.png", BED+BER,            HALF_LEFT,  EMPTY,      HALF_UP,    EMPTY      ,  25 },
-	{ "tiles/C14.png", BED+BEL,            HALF_RIGHT, EMPTY,      EMPTY,      HALF_UP    ,  25 },
-	{ "tiles/C21.png", BSU+BSL,            SOLID,      HALF_LEFT,  SOLID,      HALF_UP    ,  75 },
-	{ "tiles/C22.png", BSU+BSR,            SOLID,      HALF_RIGHT, HALF_UP,    SOLID      ,  75 },
-	{ "tiles/C23.png", BSD+BSR,            HALF_RIGHT, SOLID,      HALF_DOWN,  SOLID      ,  75 },
-	{ "tiles/C24.png", BSD+BSL,            HALF_LEFT,  SOLID,      SOLID,      HALF_DOWN  ,  75 },
+	// FileName         SolidFlags          EdgeUp      EdgeDown    EdgeLeft    EdgeRight   Fill
+	{ "tiles/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,      EMPTY,      EMPTY,      EMPTY      ,   0 }, // " "
+	{ "tiles/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,      SOLID,      SOLID,      SOLID      , 100 }, // "█"
+	{ "tiles/B1.png",  BEU+BSD,            EMPTY,      SOLID,      HALF_DOWN,  HALF_DOWN  ,  50 }, // "▄"
+	{ "tiles/B2.png",  BER+BSL,            HALF_LEFT,  HALF_LEFT,  SOLID,      EMPTY      ,  50 }, // "▌"
+	{ "tiles/B3.png",  BED+BSU,            SOLID,      EMPTY,      HALF_UP,    HALF_UP    ,  50 }, // "▀"
+	{ "tiles/B4.png",  BEL+BSR,            HALF_RIGHT, HALF_RIGHT, EMPTY,      SOLID      ,  50 }, // "▐"
+	{ "tiles/C11.png", BEU+BEL,            EMPTY,      HALF_RIGHT, EMPTY,      HALF_DOWN  ,  25 }, // "▗"
+	{ "tiles/C12.png", BEU+BER,            EMPTY,      HALF_LEFT,  HALF_DOWN,  EMPTY      ,  25 }, // "▖"
+	{ "tiles/C13.png", BED+BER,            HALF_LEFT,  EMPTY,      HALF_UP,    EMPTY      ,  25 }, // "▘"
+	{ "tiles/C14.png", BED+BEL,            HALF_RIGHT, EMPTY,      EMPTY,      HALF_UP    ,  25 }, // "▝"
+	{ "tiles/C21.png", BSU+BSL,            SOLID,      HALF_LEFT,  SOLID,      HALF_UP    ,  75 }, // "▛"
+	{ "tiles/C22.png", BSU+BSR,            SOLID,      HALF_RIGHT, HALF_UP,    SOLID      ,  75 }, // "▜"
+	{ "tiles/C23.png", BSD+BSR,            HALF_RIGHT, SOLID,      HALF_DOWN,  SOLID      ,  75 }, // "▟"
+	{ "tiles/C24.png", BSD+BSL,            HALF_LEFT,  SOLID,      SOLID,      HALF_DOWN  ,  75 }, // "▙"
+
+	{ "tiles/D11.png", BSD+BEU,            EMPTY,      SCOR_LEFT,  ECOR_DOWN,  HALF_DOWN  ,  35 },
+	{ "tiles/D12.png", BSD+BEU,            EMPTY,      SCOR_RIGHT, HALF_DOWN,  ECOR_DOWN  ,  35 },
+	{ "tiles/D13.png", BSL+BER,            ECOR_LEFT,  HALF_LEFT,  SCOR_UP,    EMPTY      ,  35 },
+	{ "tiles/D14.png", BSL+BER,            HALF_LEFT,  ECOR_LEFT,  SCOR_DOWN,  EMPTY      ,  35 },
+	{ "tiles/D15.png", BSU+BED,            SCOR_RIGHT, EMPTY,      HALF_UP,    ECOR_UP    ,  35 },
+	{ "tiles/D16.png", BSU+BED,            SCOR_LEFT,  EMPTY,      ECOR_UP,    HALF_UP    ,  35 },
+	{ "tiles/D17.png", BSR+BEL,            HALF_RIGHT, ECOR_RIGHT, EMPTY,      SCOR_DOWN  ,  35 },
+	{ "tiles/D18.png", BSR+BEL,            ECOR_RIGHT, HALF_RIGHT, EMPTY,      SCOR_UP    ,  35 },
+	{ "tiles/D21.png", BED+BSU,            SOLID,      ECOR_LEFT,  SCOR_DOWN,  HALF_UP    ,  65 },
+	{ "tiles/D22.png", BED+BSU,            SOLID,      ECOR_RIGHT, HALF_UP,    SCOR_UP    ,  65 },
+	{ "tiles/D23.png", BEL+BSR,            SCOR_LEFT,  HALF_RIGHT, ECOR_UP,    SOLID      ,  65 },
+	{ "tiles/D24.png", BEL+BSR,            HALF_RIGHT, SCOR_LEFT,  ECOR_DOWN,  SOLID      ,  65 },
+	{ "tiles/D25.png", BEU+BSD,            ECOR_RIGHT, SOLID,      HALF_DOWN,  SCOR_UP    ,  65 },
+	{ "tiles/D26.png", BEU+BSD,            ECOR_LEFT,  SOLID,      SCOR_UP,    HALF_DOWN  ,  65 },
+	{ "tiles/D27.png", BER+BSL,            HALF_LEFT,  SCOR_RIGHT, SOLID,      ECOR_DOWN  ,  65 },
+	{ "tiles/D28.png", BER+BSL,            SCOR_RIGHT, HALF_LEFT,  SOLID,      ECOR_UP    ,  65 },
+	{ "tiles/E1.png",  BEU+BSR+BSD+BEL,    ECOR_RIGHT, SCOR_LEFT,  ECOR_DOWN,  SCOR_UP    ,  50 },
+	{ "tiles/E2.png",  BEU+BER+BSD+BSL,    ECOR_LEFT,  SCOR_RIGHT, SCOR_UP,    ECOR_DOWN  ,  50 },
+	{ "tiles/E3.png",  BSU+BER+BED+BSL,    SCOR_RIGHT, ECOR_LEFT,  SCOR_DOWN,  ECOR_UP    ,  50 },
+	{ "tiles/E4.png",  BSU+BSR+BED+BEL,    SCOR_LEFT,  ECOR_RIGHT, ECOR_UP,    SCOR_DOWN  ,  50 },
+	{ "tiles/F11.png", BE+BEU+BED+BER+BEL, ECOR_LEFT,  EMPTY,      ECOR_UP,    EMPTY      ,   5 }, // "⦍"
+	{ "tiles/F12.png", BE+BEU+BED+BER+BEL, ECOR_RIGHT, EMPTY,      EMPTY,      ECOR_UP    ,   5 }, // "⦐"
+	{ "tiles/F13.png", BE+BEU+BED+BER+BEL, EMPTY,      ECOR_RIGHT, EMPTY,      ECOR_DOWN  ,   5 }, // "⦎"
+	{ "tiles/F14.png", BE+BEU+BED+BER+BEL, EMPTY,      ECOR_LEFT,  ECOR_DOWN,  EMPTY      ,   5 }, // "⦏"
+	{ "tiles/F15.png", BE+BEU+BED+BER+BEL, ECOR_LEFT,  ECOR_RIGHT, ECOR_UP,    ECOR_DOWN  ,  10 },
+	{ "tiles/F16.png", BE+BEU+BED+BER+BEL, ECOR_RIGHT, ECOR_LEFT,  ECOR_DOWN,  ECOR_UP    ,  10 },
+	{ "tiles/F21.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFT,  SOLID,      SCOR_UP,    SOLID      ,  95 }, // "⦍"
+	{ "tiles/F22.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHT, SOLID,      SOLID,      SCOR_UP    ,  95 }, // "⦐"
+	{ "tiles/F23.png", BS+BSU+BSD+BSR+BSL, SOLID,      SCOR_RIGHT, SOLID,      SCOR_DOWN  ,  95 }, // "⦎"
+	{ "tiles/F24.png", BS+BSU+BSD+BSR+BSL, SOLID,      SCOR_LEFT,  SCOR_DOWN,  SOLID      ,  95 }, // "⦏"
+	{ "tiles/F25.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFT,  SCOR_RIGHT, SCOR_UP,    SCOR_DOWN  ,  90 },
+	{ "tiles/F26.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHT, SCOR_LEFT,  SCOR_DOWN,  SCOR_UP    ,  90 },
+/*
+	{ "tiles/G11.png", BEU+BER+BEL,         },
+	{ "tiles/G12.png", BEU+BER+BEL,         },
+	{ "tiles/G13.png", BER+BED+BEU,         },
+	{ "tiles/G14.png", BER+BED+BEU,         },
+	{ "tiles/G15.png", BED+BEL+BER,         },
+	{ "tiles/G16.png", BED+BEL+BER,         },
+	{ "tiles/G17.png", BEL+BEU+BED,         },
+	{ "tiles/G18.png", BEL+BEU+BED,         },
+	{ "tiles/G21.png", BSU+BSR+BSL,         },
+	{ "tiles/G22.png", BSU+BSR+BSL,         },
+	{ "tiles/G23.png", BSR+BSD+BSU,         },
+	{ "tiles/G24.png", BSR+BSD+BSU,         },
+	{ "tiles/G25.png", BSD+BSL+BSR,         },
+	{ "tiles/G26.png", BSD+BSL+BSR,         },
+	{ "tiles/G27.png", BSL+BSU+BSD,         },
+	{ "tiles/G28.png", BSL+BSU+BSD,         },
+	{ "tiles/H11.png", BER,                 },
+	{ "tiles/H12.png", BEL,                 },
+	{ "tiles/H13.png", BED,                 },
+	{ "tiles/H14.png", BEU,                 },
+	{ "tiles/H15.png", BEL,                 },
+	{ "tiles/H16.png", BER,                 },
+	{ "tiles/H17.png", BEU,                 },
+	{ "tiles/H18.png", BED,                 },
+	{ "tiles/H21.png", BSR,                 },
+	{ "tiles/H22.png", BSL,                 },
+	{ "tiles/H23.png", BSD,                 },
+	{ "tiles/H24.png", BSU,                 },
+	{ "tiles/H25.png", BSL,                 },
+	{ "tiles/H26.png", BSR,                 },
+	{ "tiles/H27.png", BSU,                 },
+	{ "tiles/H28.png", BSD,                 },
+
+	{ "tiles/I11.png", BEU+BER+BSD+BEL,     },
+	{ "tiles/I12.png", BEU+BER+BED+BSL,     },
+	{ "tiles/I13.png", BSU+BER+BED+BEL,     },
+	{ "tiles/I14.png", BEU+BSR+BED+BEL,     },
+	{ "tiles/I21.png", BSU+BSR+BED+BSL,     },
+	{ "tiles/I22.png", BSU+BSR+BSD+BEL,     },
+	{ "tiles/I23.png", BEU+BSR+BSD+BSL,     },
+	{ "tiles/I24.png", BSU+BER+BSD+BSL,     },
+	{ "tiles/J11.png", BE,                  },
+	{ "tiles/J12.png", BE,                  },
+	{ "tiles/J13.png", BE,                  },
+	{ "tiles/J14.png", BE,                  },
+	{ "tiles/J21.png", BS,                  },
+	{ "tiles/J22.png", BS,                  },
+	{ "tiles/J23.png", BS,                  },
+	{ "tiles/J24.png", BS,                  },
+	{ "tiles/K1.png",  BE,                  },
+	{ "tiles/K2.png",  BS,                  },
+	{ "tiles/L11.png", BSD,                 },
+	{ "tiles/L12.png", BSL,                 },
+	{ "tiles/L13.png", BSU,                 },
+	{ "tiles/L14.png", BSR,                 },
+	{ "tiles/L21.png", BED,                 },
+	{ "tiles/L22.png", BEL,                 },
+	{ "tiles/L23.png", BEU,                 },
+	{ "tiles/L24.png", BER,                 },
+*/
 };
 
-enum { TILE_EMPTY=0, TILE_SOLID=1, NUM_TILES = sizeof(tiles) / sizeof(TileConfig) };
+enum {
+	TILE_EMPTY = 0,
+	TILE_SOLID = 1,
+	TILE_HALF_U = 4,
+	TILE_HALF_D = 2,
+	TILE_HALF_L = 3,
+	TILE_HALF_R = 5,
+	TILE_HALF_UL = 32,
+	TILE_HALF_UR = 33,
+	TILE_HALF_DL = 31,
+	TILE_HALF_DR = 30,
+	TILE_ECOR_UL = 5,
+	TILE_ECOR_UR = 6,
+	TILE_ECOR_DL = 8,
+	TILE_ECOR_DR = 7,
+	TILE_SCOR_UL = 9,
+	TILE_SCOR_UR = 10,
+	TILE_SCOR_DL = 12,
+	TILE_SCOR_DR = 11,
 
-bool doTilesMatchVert(const TileConfig & up, const TileConfig & down) {
-	if (up.EdgeDown == down.EdgeUp) return true;
-	return false;
-}
+	NUM_TILES = sizeof(tiles) / sizeof(TileConfig)
+};
 
 struct MapCell {
 	signed int Elevation;
@@ -116,17 +235,20 @@ struct Map {
 		for (unsigned int k=0; k<iterations; ++k) {
 			unsigned int changes = 0;
 			unsigned int wrong = 0;
-			for (unsigned int y=0; y<Height; ++y) {
-				for (unsigned int x=0; x<Width; ++x) {
+			unsigned int y0 = rand() % Height;
+			for (unsigned int yi=0; yi<Height; ++yi) {
+				unsigned int y = (y0+yi) % Height;
+				unsigned int x0 = rand() % Width;
+				for (unsigned int xi=0; xi<Width; ++xi) {
+					unsigned int x = (x0+xi) % Width;
 					int best_err = -1;
 					if (!Cells[x + y*Width].Fixed) {
 						unsigned char best_tile = 0;
 						best_err = -1;
-						int r = rand() % NUM_TILES;
-						for (int t = 0; t < NUM_TILES; ++t) {
-							int c = (r+t) % NUM_TILES; // Current tile
+						int c0 = rand() % NUM_TILES;
+						for (int ci = 0; ci < NUM_TILES; ++ci) {
+							int c = (c0+ci) % NUM_TILES; // Current tile
 							int e = 0;  // Error
-							uint32_t w = 0;
 
 							if (x > 0) {
 								int d = Cells[(x-1)+y*Width].TileID;
@@ -134,7 +256,7 @@ struct Map {
 									e += 300;
 							} else {
 								int d = Cells[(x+1)+y*Width].TileID;
-								if (Tiles[d].EdgeLeft != Tiles[c].EdgeLeft) // Mirror
+								if (HMirrorEdge(Tiles[d].EdgeLeft) != Tiles[c].EdgeLeft) // Mirror
 									e += 300;
 							}
 
@@ -144,7 +266,7 @@ struct Map {
 									e += 300;
 							} else {
 								int d = Cells[(x-1)+y*Width].TileID;
-								if (Tiles[c].EdgeRight != Tiles[d].EdgeRight) // Mirror
+								if (Tiles[c].EdgeRight != HMirrorEdge(Tiles[d].EdgeRight)) // Mirror
 									e += 300;
 							}
 
@@ -154,7 +276,7 @@ struct Map {
 									e += 300;
 							} else {
 								int d = Cells[x+(y+1)*Width].TileID;
-								if (Tiles[d].EdgeUp != Tiles[c].EdgeUp) // Mirror
+								if (VMirrorEdge(Tiles[d].EdgeUp) != Tiles[c].EdgeUp) // Mirror
 									e += 300;
 							}
 
@@ -164,7 +286,7 @@ struct Map {
 									e += 300;
 							} else {
 								int d = Cells[x+(y-1)*Width].TileID;
-								if (Tiles[c].EdgeDown != Tiles[d].EdgeDown) // Mirror
+								if (Tiles[c].EdgeDown != VMirrorEdge(Tiles[d].EdgeDown)) // Mirror
 									e += 300;
 							}
 
@@ -216,10 +338,15 @@ struct Map {
 				bool r =  (Cells[ xp + y  *Width].Elevation >= 0);
 				bool u =  (Cells[ x  + yp *Width].Elevation >= 0);
 				bool d =  (Cells[ x  + ym *Width].Elevation >= 0);
+				bool ul = (Cells[ xm + yp *Width].Elevation >= 0);
+				bool ur = (Cells[ xp + yp *Width].Elevation >= 0);
+				bool dl = (Cells[ xm + ym *Width].Elevation >= 0);
+				bool dr = (Cells[ xp + ym *Width].Elevation >= 0);
 
 				if (!u && !d && !l && !r) c = false;
 				if (u && d && l && r) c = true;
 
+				Cells[x+y*Width].TileID = TILE_SOLID;
 				Cells[x+y*Width].Fixed = false;
 				if (c & u & d & l & r) {
 					Cells[x+y*Width].TileID = TILE_SOLID;
@@ -228,7 +355,28 @@ struct Map {
 					Cells[x+y*Width].TileID = TILE_EMPTY;
 					Cells[x+y*Width].Fixed = false;
 				} else {
-					Cells[x+y*Width].TileID = TILE_SOLID;
+					uint32_t env =
+						(ul?0x100:0)+( u?0x080:0)+(ur?0x040:0)+
+						( l?0x020:0)+( c?0x010:0)+( r?0x008:0)+
+						(dl?0x004:0)+( d?0x002:0)+(dr?0x001:0);
+					switch (env) {
+						case 0b000000111: Cells[x+y*Width].TileID = TILE_HALF_U; break;
+						case 0b111000000: Cells[x+y*Width].TileID = TILE_HALF_D; break;
+						case 0b001001001: Cells[x+y*Width].TileID = TILE_HALF_L; break;
+						case 0b100100100: Cells[x+y*Width].TileID = TILE_HALF_R; break;
+						case 0b000001011: Cells[x+y*Width].TileID = TILE_HALF_UL; break;
+						case 0b000100110: Cells[x+y*Width].TileID = TILE_HALF_UR; break;
+						case 0b011001000: Cells[x+y*Width].TileID = TILE_HALF_DL; break;
+						case 0b110100000: Cells[x+y*Width].TileID = TILE_HALF_DR; break;
+						case 0b000000001: Cells[x+y*Width].TileID = TILE_ECOR_UL; break;
+						case 0b000000100: Cells[x+y*Width].TileID = TILE_ECOR_UR; break;
+						case 0b001000000: Cells[x+y*Width].TileID = TILE_ECOR_DL; break;
+						case 0b100000000: Cells[x+y*Width].TileID = TILE_ECOR_DR; break;
+						case 0b111100100: Cells[x+y*Width].TileID = TILE_SCOR_UL; break;
+						case 0b111001001: Cells[x+y*Width].TileID = TILE_SCOR_UR; break;
+						case 0b100100111: Cells[x+y*Width].TileID = TILE_SCOR_DL; break;
+						case 0b001001111: Cells[x+y*Width].TileID = TILE_SCOR_DR; break;
+					}
 				}
 			}
 		}
