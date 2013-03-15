@@ -1,3 +1,28 @@
+// Copyright (c) 2013, Miriam Ruiz <miriam@debian.org> - All rights reserved
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution. 
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED.
+//
+// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #include <sys/types.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
@@ -7,6 +32,7 @@
 #include <cmath>
 
 enum {
+	// B(lock) + S(olid)/E(mpty) + U(p)/D(own)/L(eft)/R(ight)
 	BS = 1 << 0, BSU = 1 << 1, BSD = 1 << 2, BSL = 1 << 3, BSR = 1 << 4,
 	BE = 1 << 5, BEU = 1 << 6, BED = 1 << 7, BEL = 1 << 8, BER = 1 << 9,
 };
@@ -16,6 +42,7 @@ enum {
 	HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
 	SYMMETRIC_EDGES_MAX = HALF_RIGHT,
 
+	// E(mpty)/S(olid) + COR(ner) + _ + UP/DOWN/LEFT/RIGHT + T(angential)/N(ormal)
 	ECOR_UPT = ((SYMMETRIC_EDGES_MAX + 1) & 254),
 	ECOR_UPN,    SCOR_UPT,    SCOR_UPN,
 	ECOR_DOWNT,  ECOR_DOWNN,  SCOR_DOWNT,  SCOR_DOWNN,
@@ -440,7 +467,7 @@ int main()
 {
 	srand((unsigned)time(0));
 
-	Map map(25, 20, tiles);
+	Map map(32, 24, tiles);
 	map.Random();
 
 	// Create the main rendering window
@@ -467,9 +494,6 @@ int main()
 			if (Event.Type == sf::Event::Closed)
 			App.Close();
 		}
-
-		// Get elapsed time
-		float ElapsedTime = App.GetFrameTime();
 
 		// Clear screen
 		App.Clear();
