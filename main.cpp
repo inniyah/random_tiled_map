@@ -40,15 +40,20 @@ enum {
 enum {
 	EMPTY, SOLID,
 	HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
+
 	SYMMETRIC_EDGES_MAX = HALF_RIGHT,
 
-	// E(mpty)/S(olid) + COR(ner) + _ + UP/DOWN/LEFT/RIGHT + T(angential)/N(ormal)
+	// E(mpty)/S(olid)/H(alf)/O(ppositehalf) + COR(ner) + _ + UP/DOWN/LEFT/RIGHT + T(angential)/N(ormal)
 	ECOR_UPT = ((SYMMETRIC_EDGES_MAX + 1) & 254),
-	ECOR_UPN,    SCOR_UPT,    SCOR_UPN,
-	ECOR_DOWNT,  ECOR_DOWNN,  SCOR_DOWNT,  SCOR_DOWNN,
-	ECOR_LEFTT,  ECOR_LEFTN,  SCOR_LEFTT,  SCOR_LEFTN,
-	ECOR_RIGHTT, ECOR_RIGHTN, SCOR_RIGHTT, SCOR_RIGHTN,
-	COMPLEMENTARY_EDGES_MAX = SCOR_RIGHTN,
+	             ECOR_UPN,    SCOR_UPT,    SCOR_UPN,    HCOR_UPT,    HCOR_UPN,    OCOR_UPT,    OCOR_UPN,
+	ECOR_DOWNT,  ECOR_DOWNN,  SCOR_DOWNT,  SCOR_DOWNN,  HCOR_DOWNT,  HCOR_DOWNN,  OCOR_DOWNT,  OCOR_DOWNN,
+	ECOR_LEFTT,  ECOR_LEFTN,  SCOR_LEFTT,  SCOR_LEFTN,  HCOR_LEFTT,  HCOR_LEFTN,  OCOR_LEFTT,  OCOR_LEFTN,
+	ECOR_RIGHTT, ECOR_RIGHTN, SCOR_RIGHTT, SCOR_RIGHTN, HCOR_RIGHTT, HCOR_RIGHTN, OCOR_RIGHTT, OCOR_RIGHTN,
+
+	// E(mpty)/S(olid) + BI + CORNER + T(angential)/N(ormal)
+	EBICORNERT,  EBICORNERN,  SBICORNERT,  SBICORNERN,
+
+	COMPLEMENTARY_EDGES_MAX = SBICORNERN,
 };
 
 int HMirrorEdge(int edge) {
@@ -104,6 +109,7 @@ const TileConfig tiles[] = {
 	{ "tiles/C23.png", BSD+BSR,            HALF_RIGHT,  SOLID,       HALF_DOWN,   SOLID       ,  75 }, // "▟"
 	{ "tiles/C24.png", BSD+BSL,            HALF_LEFT,   SOLID,       SOLID,       HALF_DOWN   ,  75 }, // "▙"
 
+	// Open Corners
 	{ "tiles/D11.png", BSD+BEU,            EMPTY,       SCOR_LEFTN,  ECOR_DOWNN,  HALF_DOWN   ,  35 },
 	{ "tiles/D12.png", BSD+BEU,            EMPTY,       SCOR_RIGHTN, HALF_DOWN,   ECOR_DOWNN  ,  35 },
 	{ "tiles/D13.png", BSL+BER,            ECOR_LEFTN,  HALF_LEFT,   SCOR_UPN,    EMPTY       ,  35 },
@@ -120,6 +126,8 @@ const TileConfig tiles[] = {
 	{ "tiles/D26.png", BEU+BSD,            ECOR_LEFTN,  SOLID,       SCOR_UPN,    HALF_DOWN   ,  65 },
 	{ "tiles/D27.png", BER+BSL,            HALF_LEFT,   SCOR_RIGHTN, SOLID,       ECOR_DOWNN  ,  65 },
 	{ "tiles/D28.png", BER+BSL,            SCOR_RIGHTN, HALF_LEFT,   SOLID,       ECOR_UPN    ,  65 },
+
+	// Oblique Tiles
 	{ "tiles/E1.png",  BEU+BSR+BSD+BEL,    ECOR_RIGHTN, SCOR_LEFTN,  ECOR_DOWNN,  SCOR_UPN    ,  50 },
 	{ "tiles/E2.png",  BEU+BER+BSD+BSL,    ECOR_LEFTN,  SCOR_RIGHTN, SCOR_UPN,    ECOR_DOWNN  ,  50 },
 	{ "tiles/E3.png",  BSU+BER+BED+BSL,    SCOR_RIGHTN, ECOR_LEFTN,  SCOR_DOWNN,  ECOR_UPN    ,  50 },
@@ -136,59 +144,63 @@ const TileConfig tiles[] = {
 	{ "tiles/F24.png", BS+BSU+BSD+BSR+BSL, SOLID,       SCOR_LEFTT,  SCOR_DOWNT,  SOLID       ,  95 }, // "⦏"
 	{ "tiles/F25.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFTT,  SCOR_RIGHTT, SCOR_UPT,    SCOR_DOWNT  ,  90 },
 	{ "tiles/F26.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHTT, SCOR_LEFTT,  SCOR_DOWNT,  SCOR_UPT    ,  90 },
-/*
-	{ "tiles/G11.png", BEU+BER+BEL,         },
-	{ "tiles/G12.png", BEU+BER+BEL,         },
-	{ "tiles/G13.png", BER+BED+BEU,         },
-	{ "tiles/G14.png", BER+BED+BEU,         },
-	{ "tiles/G15.png", BED+BEL+BER,         },
-	{ "tiles/G16.png", BED+BEL+BER,         },
-	{ "tiles/G17.png", BEL+BEU+BED,         },
-	{ "tiles/G18.png", BEL+BEU+BED,         },
-	{ "tiles/G21.png", BSU+BSR+BSL,         },
-	{ "tiles/G22.png", BSU+BSR+BSL,         },
-	{ "tiles/G23.png", BSR+BSD+BSU,         },
-	{ "tiles/G24.png", BSR+BSD+BSU,         },
-	{ "tiles/G25.png", BSD+BSL+BSR,         },
-	{ "tiles/G26.png", BSD+BSL+BSR,         },
-	{ "tiles/G27.png", BSL+BSU+BSD,         },
-	{ "tiles/G28.png", BSL+BSU+BSD,         },
-	{ "tiles/H11.png", BER,                 },
-	{ "tiles/H12.png", BEL,                 },
-	{ "tiles/H13.png", BED,                 },
-	{ "tiles/H14.png", BEU,                 },
-	{ "tiles/H15.png", BEL,                 },
-	{ "tiles/H16.png", BER,                 },
-	{ "tiles/H17.png", BEU,                 },
-	{ "tiles/H18.png", BED,                 },
-	{ "tiles/H21.png", BSR,                 },
-	{ "tiles/H22.png", BSL,                 },
-	{ "tiles/H23.png", BSD,                 },
-	{ "tiles/H24.png", BSU,                 },
-	{ "tiles/H25.png", BSL,                 },
-	{ "tiles/H26.png", BSR,                 },
-	{ "tiles/H27.png", BSU,                 },
-	{ "tiles/H28.png", BSD,                 },
 
-	{ "tiles/I11.png", BEU+BER+BSD+BEL,     },
-	{ "tiles/I12.png", BEU+BER+BED+BSL,     },
-	{ "tiles/I13.png", BSU+BER+BED+BEL,     },
-	{ "tiles/I14.png", BEU+BSR+BED+BEL,     },
-	{ "tiles/I21.png", BSU+BSR+BED+BSL,     },
-	{ "tiles/I22.png", BSU+BSR+BSD+BEL,     },
-	{ "tiles/I23.png", BEU+BSR+BSD+BSL,     },
-	{ "tiles/I24.png", BSU+BER+BSD+BSL,     },
-	{ "tiles/J11.png", BE,                  },
-	{ "tiles/J12.png", BE,                  },
-	{ "tiles/J13.png", BE,                  },
-	{ "tiles/J14.png", BE,                  },
-	{ "tiles/J21.png", BS,                  },
-	{ "tiles/J22.png", BS,                  },
-	{ "tiles/J23.png", BS,                  },
-	{ "tiles/J24.png", BS,                  },
-	{ "tiles/K1.png",  BE,                  },
-	{ "tiles/K2.png",  BS,                  },
-	{ "tiles/L11.png", BSD,                 },
+	// Close Corners
+	{ "tiles/G11.png", BEU+BER+BEL,        EMPTY,       HCOR_LEFTN,  ECOR_DOWNN,  EMPTY       ,  15 },
+	{ "tiles/G12.png", BEU+BER+BEL,        EMPTY,       HCOR_RIGHTN, EMPTY,       ECOR_DOWNN  ,  15 },
+	{ "tiles/G13.png", BER+BED+BEU,        ECOR_LEFTN,  EMPTY,       HCOR_UPN,    EMPTY       ,  15 },
+	{ "tiles/G14.png", BER+BED+BEU,        EMPTY,       ECOR_LEFTN,  HCOR_DOWNN,  EMPTY       ,  15 },
+	{ "tiles/G15.png", BED+BEL+BER,        HCOR_RIGHTN, EMPTY,       EMPTY,       ECOR_UPN    ,  15 },
+	{ "tiles/G16.png", BED+BEL+BER,        HCOR_LEFTN,  EMPTY,       ECOR_UPN,    EMPTY       ,  15 },
+	{ "tiles/G17.png", BEL+BEU+BED,        EMPTY,       ECOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 },
+	{ "tiles/G18.png", BEL+BEU+BED,        ECOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 },
+	{ "tiles/G21.png", BSU+BSR+BSL,        SOLID,       OCOR_LEFTN,  SCOR_DOWNN,  SOLID       ,  85 },
+	{ "tiles/G22.png", BSU+BSR+BSL,        SOLID,       OCOR_RIGHTN, SOLID,       SCOR_DOWNN  ,  85 },
+	{ "tiles/G23.png", BSR+BSD+BSU,        SCOR_LEFTN,  SOLID,       OCOR_UPN,    SOLID       ,  85 },
+	{ "tiles/G24.png", BSR+BSD+BSU,        SOLID,       SCOR_LEFTN,  OCOR_DOWNN,  SOLID       ,  85 },
+	{ "tiles/G25.png", BSD+BSL+BSR,        OCOR_RIGHTN, SOLID,       SOLID,       SCOR_UPN    ,  85 },
+	{ "tiles/G26.png", BSD+BSL+BSR,        OCOR_LEFTN,  SOLID,       SCOR_UPN,    SOLID       ,  85 },
+	{ "tiles/G27.png", BSL+BSU+BSD,        SOLID,       SCOR_RIGHTN, SOLID,       OCOR_DOWNN  ,  85 },
+	{ "tiles/G28.png", BSL+BSU+BSD,        SCOR_RIGHTN, SOLID,       SOLID,       OCOR_UPN    ,  85 },
+	{ "tiles/H11.png", BER,                HCOR_LEFTT,  HALF_LEFT,   SCOR_UPT,    EMPTY       ,  45 },
+	{ "tiles/H12.png", BEL,                HCOR_RIGHTT, HALF_RIGHT,  EMPTY,       SCOR_UPT    ,  45 },
+	{ "tiles/H13.png", BED,                SCOR_RIGHTT, EMPTY,       HALF_UP,     HCOR_UPT    ,  45 },
+	{ "tiles/H14.png", BEU,                EMPTY,       SCOR_RIGHTT, HALF_DOWN,   HCOR_DOWNT  ,  45 },
+	{ "tiles/H15.png", BEL,                HALF_RIGHT,  HCOR_RIGHTT, EMPTY,       SCOR_DOWNT  ,  45 },
+	{ "tiles/H16.png", BER,                HALF_LEFT,   HCOR_LEFTT,  SCOR_DOWNT,  EMPTY       ,  45 },
+	{ "tiles/H17.png", BEU,                EMPTY,       SCOR_LEFTT,  HCOR_DOWNT,  HALF_DOWN   ,  45 },
+	{ "tiles/H18.png", BED,                SCOR_LEFTT,  EMPTY,       HCOR_UPT,    HALF_UP     ,  45 },
+	{ "tiles/H21.png", BSR,                OCOR_LEFTT,  HALF_RIGHT,  ECOR_UPT,    SOLID       ,  55 },
+	{ "tiles/H22.png", BSL,                OCOR_RIGHTT, HALF_LEFT,   SOLID,       ECOR_UPT    ,  55 },
+	{ "tiles/H23.png", BSD,                ECOR_RIGHTT, SOLID,       HALF_DOWN,   OCOR_UPT    ,  55 },
+	{ "tiles/H24.png", BSU,                SOLID,       ECOR_RIGHTT, HALF_UP,     OCOR_DOWNT  ,  55 },
+	{ "tiles/H25.png", BSL,                HALF_LEFT,   OCOR_RIGHTT, SOLID,       ECOR_DOWNT  ,  55 },
+	{ "tiles/H26.png", BSR,                HALF_RIGHT,  OCOR_LEFTT,  ECOR_DOWNT,  SOLID       ,  55 },
+	{ "tiles/H27.png", BSU,                SOLID,       ECOR_LEFTT,  OCOR_DOWNT,  HALF_UP     ,  55 },
+	{ "tiles/H28.png", BSD,                ECOR_LEFTT,  SOLID,       OCOR_UPT,    HALF_DOWN   ,  55 },
+
+	// Oblique Corners
+	{ "tiles/I11.png", BEU+BER+BSD+BEL,    EMPTY,       SBICORNERN,  ECOR_DOWNN,  ECOR_DOWNN  ,  20 },
+	{ "tiles/I12.png", BEU+BER+BED+BSL,    ECOR_LEFTN,  ECOR_LEFTN,  SBICORNERN,  EMPTY       ,  20 },
+	{ "tiles/I13.png", BSU+BER+BED+BEL,    SBICORNERN,  EMPTY,       ECOR_UPN,    ECOR_UPN    ,  20 },
+	{ "tiles/I14.png", BEU+BSR+BED+BEL,    ECOR_RIGHTN, ECOR_RIGHTN, EMPTY,       SBICORNERN  ,  20 },
+	{ "tiles/I21.png", BSU+BSR+BED+BSL,    SOLID,       EBICORNERN,  SCOR_DOWNN,  SCOR_DOWNN  ,  80 },
+	{ "tiles/I22.png", BSU+BSR+BSD+BEL,    SCOR_LEFTN,  SCOR_LEFTN,  EBICORNERN,  SOLID       ,  80 },
+	{ "tiles/I23.png", BEU+BSR+BSD+BSL,    EBICORNERN,  SOLID,       SCOR_UPN,    SCOR_UPN    ,  80 },
+	{ "tiles/I24.png", BSU+BER+BSD+BSL,    ECOR_RIGHTN, ECOR_RIGHTN, SOLID,       EBICORNERN  ,  80 },
+	{ "tiles/J11.png", BE,                 SBICORNERT,  SOLID,       SCOR_UPT,    SCOR_UPT    ,  90 },
+	{ "tiles/J12.png", BE,                 SCOR_RIGHTT, SCOR_RIGHTT, SOLID,       SBICORNERT  ,  90 },
+	{ "tiles/J13.png", BE,                 SOLID,       SBICORNERT,  SCOR_DOWNT,  SCOR_DOWNT  ,  90 },
+	{ "tiles/J14.png", BE,                 SCOR_LEFTT,  SCOR_LEFTT,  SBICORNERT,  SOLID       ,  90 },
+	{ "tiles/J21.png", BS,                 EBICORNERT,  EMPTY,       ECOR_UPT,    ECOR_UPT    ,  10 },
+	{ "tiles/J22.png", BS,                 ECOR_RIGHTT, ECOR_RIGHTT, EMPTY,       EBICORNERT  ,  10 },
+	{ "tiles/J23.png", BS,                 EMPTY,       EBICORNERT,  ECOR_DOWNT,  ECOR_DOWNT  ,  10 },
+	{ "tiles/J24.png", BS,                 ECOR_LEFTT,  ECOR_LEFTT,  EBICORNERT,  EMPTY       ,  10 },
+/*
+	// Singularities
+	{ "tiles/K1.png",  BE,                 EBICORNERT,  EBICORNERT,  EBICORNERT,  EBICORNERT  ,  80 },
+	{ "tiles/K2.png",  BS,                 SBICORNERT,  SBICORNERT,  SBICORNERT,  SBICORNERT  ,  20 },
+	{ "tiles/L11.png", BSD,                EBICORNERT,  SOLID,       OCOR_UPT,    OCOR_UPT    ,  50 },
 	{ "tiles/L12.png", BSL,                 },
 	{ "tiles/L13.png", BSU,                 },
 	{ "tiles/L14.png", BSR,                 },
@@ -196,8 +208,7 @@ const TileConfig tiles[] = {
 	{ "tiles/L22.png", BEL,                 },
 	{ "tiles/L23.png", BEU,                 },
 	{ "tiles/L24.png", BER,                 },
-*/
-};
+*/};
 
 enum {
 	TILE_EMPTY = 0,
