@@ -196,19 +196,19 @@ const TileConfig tiles[] = {
 	{ "tiles/J22.png", BS,                 ECOR_RIGHTT, ECOR_RIGHTT, EMPTY,       EBICORNERT  ,  10 },
 	{ "tiles/J23.png", BS,                 EMPTY,       EBICORNERT,  ECOR_DOWNT,  ECOR_DOWNT  ,  10 },
 	{ "tiles/J24.png", BS,                 ECOR_LEFTT,  ECOR_LEFTT,  EBICORNERT,  EMPTY       ,  10 },
-/*
+
 	// Singularities
 	{ "tiles/K1.png",  BE,                 EBICORNERT,  EBICORNERT,  EBICORNERT,  EBICORNERT  ,  80 },
 	{ "tiles/K2.png",  BS,                 SBICORNERT,  SBICORNERT,  SBICORNERT,  SBICORNERT  ,  20 },
-	{ "tiles/L11.png", BSD,                EBICORNERT,  SOLID,       OCOR_UPT,    OCOR_UPT    ,  50 },
-	{ "tiles/L12.png", BSL,                 },
-	{ "tiles/L13.png", BSU,                 },
-	{ "tiles/L14.png", BSR,                 },
-	{ "tiles/L21.png", BED,                 },
-	{ "tiles/L22.png", BEL,                 },
-	{ "tiles/L23.png", BEU,                 },
-	{ "tiles/L24.png", BER,                 },
-*/};
+	{ "tiles/L11.png", BSD,                EBICORNERT,  SOLID,       OCOR_UPT,    OCOR_UPT    ,  60 },
+	{ "tiles/L12.png", BSL,                OCOR_RIGHTT, OCOR_RIGHTT, SOLID,       EBICORNERT  ,  60 },
+	{ "tiles/L13.png", BSU,                SOLID,       EBICORNERT,  OCOR_DOWNT,  OCOR_DOWNT  ,  60 },
+	{ "tiles/L14.png", BSR,                OCOR_LEFTT,  OCOR_LEFTT,  EBICORNERT,  SOLID       ,  60 },
+	{ "tiles/L21.png", BED,                SBICORNERT,  EMPTY,       HCOR_UPT,    HCOR_UPT    ,  40 },
+	{ "tiles/L22.png", BEL,                HCOR_RIGHTT, HCOR_RIGHTT, EMPTY,       SBICORNERT  ,  40 },
+	{ "tiles/L23.png", BEU,                EMPTY,       SBICORNERT,  HCOR_DOWNT,  HCOR_DOWNT  ,  40 },
+	{ "tiles/L24.png", BER,                HCOR_LEFTT,  HCOR_LEFTT,  SBICORNERT,  EMPTY       ,  40 },
+};
 
 enum {
 	TILE_EMPTY = 0,
