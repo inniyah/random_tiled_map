@@ -292,8 +292,9 @@ struct Map {
 		};
 	};
 
-	bool AdjustTiles(unsigned int iterations = 100) {
+	bool AdjustTiles(unsigned int iterations = 1000) {
 		bool tiles_ok[Width * Height];
+		unsigned int min_wrong;
 		for (unsigned int k=0; k<iterations; ++k) {
 			unsigned int changes = 0;
 			unsigned int wrong = 0;
@@ -369,7 +370,7 @@ struct Map {
 				}
 			}
 			printf("Iter=%d, Changes= %d, Wrong=%d\n", k, changes, wrong);
-			if (!changes && wrong) {
+			if (wrong && (!changes || (min_wrong ? wrong >= min_wrong : false))) {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
 						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].Fixed) {
@@ -383,6 +384,7 @@ struct Map {
 				}
 			}
 			if (!changes && !wrong) return true; // No wrong tiles
+			if (min_wrong || wrong < min_wrong) min_wrong = wrong;
 		}
 		return false; // We still have wrong tiles, but we give up
 	}
@@ -413,10 +415,14 @@ struct Map {
 				Cells[x+y*Width].Fixed = false;
 				if (c & u & d & l & r) {
 					Cells[x+y*Width].TileID = TILE_SOLID;
-					Cells[x+y*Width].Fixed = true;
+					//if (ul & ur & dl & dr) {
+					//	Cells[x+y*Width].Fixed = true;
+					//}
 				} else if (!c & !u & !d & !l & !r) {
 					Cells[x+y*Width].TileID = TILE_EMPTY;
-					Cells[x+y*Width].Fixed = false;
+					//if (!ul & !ur & !dl & !dr) {
+					//	Cells[x+y*Width].Fixed = true;
+					//}
 				} else {
 					uint32_t env =
 						(ul?0x100:0)+( u?0x080:0)+(ur?0x040:0)+
@@ -462,8 +468,11 @@ struct Map {
 		}
 		printf("\n");
 
-		SetupTiles();
-		return AdjustTiles();
+		for (unsigned int tries = 0 ; tries < 1; ++tries) {
+			SetupTiles();
+			if (AdjustTiles()) return true;
+		}
+		return false;
 	}
 
 	unsigned int Width;
@@ -488,7 +497,7 @@ int main()
 	sf::Image tiles_images[NUM_TILES];
 	sf::Sprite tiles_sprites[NUM_TILES];
 	for (int i=0; i<NUM_TILES;++i) {
-		printf("Loading '%s'\n", tiles[i].FileName);
+		//printf("Loading '%s'\n", tiles[i].FileName);
 		if (!tiles_images[i].LoadFromFile(tiles[i].FileName)) {
 			return EXIT_FAILURE;
 		}
