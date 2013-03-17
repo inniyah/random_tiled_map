@@ -31,68 +31,160 @@
 #include <cstring>
 #include <cmath>
 
-enum {
-	// B(lock) + S(olid)/E(mpty) + U(p)/D(own)/L(eft)/R(ight)
-	BS = 1 << 0, BSU = 1 << 1, BSD = 1 << 2, BSL = 1 << 3, BSR = 1 << 4,
-	BE = 1 << 5, BEU = 1 << 6, BED = 1 << 7, BEL = 1 << 8, BER = 1 << 9,
-};
 
-enum {
-	EMPTY, SOLID,
-	HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
+class TileSet {
+public:
+	enum {
+		// B(lock) + S(olid)/E(mpty) + U(p)/D(own)/L(eft)/R(ight)
+		BS = 1 << 0, BSU = 1 << 1, BSD = 1 << 2, BSL = 1 << 3, BSR = 1 << 4,
+		BE = 1 << 5, BEU = 1 << 6, BED = 1 << 7, BEL = 1 << 8, BER = 1 << 9,
+	};
 
-	SYMMETRIC_EDGES_MAX = HALF_RIGHT,
+	enum {
+		EMPTY, SOLID,
+		HALF_UP, HALF_DOWN, HALF_LEFT, HALF_RIGHT,
 
-	// E(mpty)/S(olid)/H(alf)/O(ppositehalf) + COR(ner) + _ + UP/DOWN/LEFT/RIGHT + T(angential)/N(ormal)
-	ECOR_UPT = ((SYMMETRIC_EDGES_MAX + 1) & 254),
-	             ECOR_UPN,    SCOR_UPT,    SCOR_UPN,    HCOR_UPT,    HCOR_UPN,    OCOR_UPT,    OCOR_UPN,
-	ECOR_DOWNT,  ECOR_DOWNN,  SCOR_DOWNT,  SCOR_DOWNN,  HCOR_DOWNT,  HCOR_DOWNN,  OCOR_DOWNT,  OCOR_DOWNN,
-	ECOR_LEFTT,  ECOR_LEFTN,  SCOR_LEFTT,  SCOR_LEFTN,  HCOR_LEFTT,  HCOR_LEFTN,  OCOR_LEFTT,  OCOR_LEFTN,
-	ECOR_RIGHTT, ECOR_RIGHTN, SCOR_RIGHTT, SCOR_RIGHTN, HCOR_RIGHTT, HCOR_RIGHTN, OCOR_RIGHTT, OCOR_RIGHTN,
+		SYMMETRIC_EDGES_MAX = HALF_RIGHT,
 
-	// E(mpty)/S(olid) + BI + CORNER + T(angential)/N(ormal)
-	EBICORNERT,  EBICORNERN,  SBICORNERT,  SBICORNERN,
+		// E(mpty)/S(olid)/H(alf)/O(ppositehalf) + COR(ner) + _ + UP/DOWN/LEFT/RIGHT + T(angential)/N(ormal)
+		ECOR_UPT = ((SYMMETRIC_EDGES_MAX + 1) & 254),
+			     ECOR_UPN,    SCOR_UPT,    SCOR_UPN,    HCOR_UPT,    HCOR_UPN,    OCOR_UPT,    OCOR_UPN,
+		ECOR_DOWNT,  ECOR_DOWNN,  SCOR_DOWNT,  SCOR_DOWNN,  HCOR_DOWNT,  HCOR_DOWNN,  OCOR_DOWNT,  OCOR_DOWNN,
+		ECOR_LEFTT,  ECOR_LEFTN,  SCOR_LEFTT,  SCOR_LEFTN,  HCOR_LEFTT,  HCOR_LEFTN,  OCOR_LEFTT,  OCOR_LEFTN,
+		ECOR_RIGHTT, ECOR_RIGHTN, SCOR_RIGHTT, SCOR_RIGHTN, HCOR_RIGHTT, HCOR_RIGHTN, OCOR_RIGHTT, OCOR_RIGHTN,
 
-	COMPLEMENTARY_EDGES_MAX = SBICORNERN,
-};
+		// E(mpty)/S(olid) + BI + CORNER + T(angential)/N(ormal)
+		EBICORNERT,  EBICORNERN,  SBICORNERT,  SBICORNERN,
 
-int HMirrorEdge(int edge) {
-	return edge;
-}
+		COMPLEMENTARY_EDGES_MAX = SBICORNERN,
+	};
 
-int VMirrorEdge(int edge) {
-	return edge;
-}
+	int HMirrorEdge(int edge) const {
+		return edge;
+	}
 
-int EdgesMatchError(int e1, int e2) {
-	if (e1 <= SYMMETRIC_EDGES_MAX) {
-		if (e1 == e2)
-			return 0;
+	int VMirrorEdge(int edge) const {
+		return edge;
+	}
+
+	int EdgesMatchError(int e1, int e2) const {
+		if (e1 <= SYMMETRIC_EDGES_MAX || e2 <= SYMMETRIC_EDGES_MAX) {
+			if (e1 == e2)
+				return 0;
+			return 100;
+		}
+
+		if (e1 <= COMPLEMENTARY_EDGES_MAX || e2 <= COMPLEMENTARY_EDGES_MAX) {
+			if (e1 == e2)
+				return 50;
+			if ((e1 & 254) == (e2 & 254))
+				return 0;
+			return 100;
+		}
+
 		return 100;
 	}
 
-	if (e1 <= COMPLEMENTARY_EDGES_MAX && e2 <= COMPLEMENTARY_EDGES_MAX) {
-		if (e1 == e2)
-			return 50;
-		if ((e1 & 254) == (e2 & 254))
-			return 0;
-		return 100;
+	struct TileConfig {
+		const char * FileName;
+		uint32_t SolidFlags;
+		int EdgeUp;
+		int EdgeDown;
+		int EdgeLeft;
+		int EdgeRight;
+		int Fill;
+	};
+
+	static const TileConfig TileData[];
+	static unsigned int TileDataNumAllTiles;
+
+	unsigned int NumTiles() const {
+		return TileDataNumAllTiles;
 	}
 
-	return 100;
-}
+	inline const TileConfig &getTile(unsigned int index) const {
+		return TileData[index];
+	}
+	inline const char * FileName(unsigned int index) const {
+		return TileData[index].FileName;
+	}
+	inline uint32_t SolidFlags(unsigned int index) const {
+		return TileData[index].SolidFlags;
+	}
+	inline int EdgeUp(unsigned int index) const {
+		return TileData[index].EdgeUp;
+	}
+	inline int EdgeDown(unsigned int index) const {
+		return TileData[index].EdgeDown;
+	}
+	inline int EdgeLeft(unsigned int index) const {
+		return TileData[index].EdgeLeft;
+	}
+	inline int EdgeRight(unsigned int index) const {
+		return TileData[index].EdgeRight;
+	}
+	inline int Fill(unsigned int index) const {
+		return TileData[index].Fill;
+	}
 
-struct TileConfig {
-	const char * FileName;
-	uint32_t SolidFlags;
-	int EdgeUp;
-	int EdgeDown;
-	int EdgeLeft;
-	int EdgeRight;
-	int Fill;
+	enum {
+		TILE_EMPTY = 0,
+		TILE_SOLID = 1,
+		TILE_HALF_U = 4,
+		TILE_HALF_D = 2,
+		TILE_HALF_L = 3,
+		TILE_HALF_R = 5,
+		TILE_HALF_UL = 32,
+		TILE_HALF_UR = 33,
+		TILE_HALF_DL = 31,
+		TILE_HALF_DR = 30,
+		TILE_ECOR_UL = 5,
+		TILE_ECOR_UR = 6,
+		TILE_ECOR_DL = 8,
+		TILE_ECOR_DR = 7,
+		TILE_SCOR_UL = 9,
+		TILE_SCOR_UR = 10,
+		TILE_SCOR_DL = 12,
+		TILE_SCOR_DR = 11,
+	};
+
+	inline unsigned int SolidTile() const {
+		return TILE_SOLID;
+	}
+
+	inline unsigned int EmptyTile() const {
+		return TILE_EMPTY;
+	}
+
+	// env is a binary number representing flags that describe the environment:
+	// 0b(ul)(u)(ur)(l)(c)(r)(dl)(d)(dr)
+	inline unsigned int InitialTileGuess(uint32_t env) const {
+		switch (env) {
+			case 0b000000111: return TILE_HALF_U;
+			case 0b111000000: return TILE_HALF_D;
+			case 0b001001001: return TILE_HALF_L;
+			case 0b100100100: return TILE_HALF_R;
+			case 0b000001011: return TILE_HALF_UL;
+			case 0b000100110: return TILE_HALF_UR;
+			case 0b011001000: return TILE_HALF_DL;
+			case 0b110100000: return TILE_HALF_DR;
+			case 0b000000001: return TILE_ECOR_UL;
+			case 0b000000100: return TILE_ECOR_UR;
+			case 0b001000000: return TILE_ECOR_DL;
+			case 0b100000000: return TILE_ECOR_DR;
+			case 0b111100100: return TILE_SCOR_UL;
+			case 0b111001001: return TILE_SCOR_UR;
+			case 0b100100111: return TILE_SCOR_DL;
+			case 0b001001111: return TILE_SCOR_DR;
+			default:          return TILE_SOLID;
+		}
+	}
+
+private:
+
 };
 
-const TileConfig tiles[] = {
+const TileSet::TileConfig TileSet::TileData[] = {
 	// FileName         SolidFlags          EdgeUp       EdgeDown     EdgeLeft     EdgeRight    Fill
 	{ "tiles/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,       EMPTY,       EMPTY,       EMPTY       ,   0 }, // " "
 	{ "tiles/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,       SOLID,       SOLID,       SOLID       , 100 }, // "█"
@@ -152,8 +244,8 @@ const TileConfig tiles[] = {
 	{ "tiles/G14.png", BER+BED+BEU,        EMPTY,       ECOR_LEFTN,  HCOR_DOWNN,  EMPTY       ,  15 },
 	{ "tiles/G15.png", BED+BEL+BER,        HCOR_RIGHTN, EMPTY,       EMPTY,       ECOR_UPN    ,  15 },
 	{ "tiles/G16.png", BED+BEL+BER,        HCOR_LEFTN,  EMPTY,       ECOR_UPN,    EMPTY       ,  15 },
-	{ "tiles/G17.png", BEL+BEU+BED,        EMPTY,       ECOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 },
-	{ "tiles/G18.png", BEL+BEU+BED,        ECOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 },
+	{ "tiles/G17.png", BEL+BEU+BED,        EMPTY,       HCOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 },
+	{ "tiles/G18.png", BEL+BEU+BED,        HCOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 },
 	{ "tiles/G21.png", BSU+BSR+BSL,        SOLID,       OCOR_LEFTN,  SCOR_DOWNN,  SOLID       ,  85 },
 	{ "tiles/G22.png", BSU+BSR+BSL,        SOLID,       OCOR_RIGHTN, SOLID,       SCOR_DOWNN  ,  85 },
 	{ "tiles/G23.png", BSR+BSD+BSU,        SCOR_LEFTN,  SOLID,       OCOR_UPN,    SOLID       ,  85 },
@@ -210,28 +302,7 @@ const TileConfig tiles[] = {
 	{ "tiles/L24.png", BER,                HCOR_LEFTT,  HCOR_LEFTT,  SBICORNERT,  EMPTY       ,  40 },
 };
 
-enum {
-	TILE_EMPTY = 0,
-	TILE_SOLID = 1,
-	TILE_HALF_U = 4,
-	TILE_HALF_D = 2,
-	TILE_HALF_L = 3,
-	TILE_HALF_R = 5,
-	TILE_HALF_UL = 32,
-	TILE_HALF_UR = 33,
-	TILE_HALF_DL = 31,
-	TILE_HALF_DR = 30,
-	TILE_ECOR_UL = 5,
-	TILE_ECOR_UR = 6,
-	TILE_ECOR_DL = 8,
-	TILE_ECOR_DR = 7,
-	TILE_SCOR_UL = 9,
-	TILE_SCOR_UR = 10,
-	TILE_SCOR_DL = 12,
-	TILE_SCOR_DR = 11,
-
-	NUM_TILES = sizeof(tiles) / sizeof(TileConfig)
-};
+unsigned int TileSet::TileDataNumAllTiles = sizeof(TileSet::TileData) / sizeof(TileSet::TileConfig);
 
 struct MapCell {
 	signed int Elevation;
@@ -240,8 +311,8 @@ struct MapCell {
 };
 
 struct Map {
-	Map(unsigned int w, unsigned int h, const TileConfig * tiles) :
-	Width(w), Height(h), Tiles(tiles), MaxElevation(100), MinElevation(-100) {
+	Map(unsigned int w, unsigned int h, const TileSet & tile_set) :
+	Width(w), Height(h), Tiles(&tile_set), MaxElevation(100), MinElevation(-100) {
 		Cells = new MapCell[h*w];
 		memset(Cells, 0, h*w*sizeof(MapCell));
 	}
@@ -292,7 +363,7 @@ struct Map {
 		};
 	};
 
-	bool AdjustTiles(unsigned int iterations = 1000) {
+	bool AdjustTiles(unsigned int iterations = 200) {
 		bool tiles_ok[Width * Height];
 		unsigned int min_wrong;
 		for (unsigned int k=0; k<iterations; ++k) {
@@ -308,49 +379,53 @@ struct Map {
 					if (!Cells[x + y*Width].Fixed) {
 						unsigned char best_tile = 0;
 						best_err = -1;
-						int c0 = rand() % NUM_TILES;
-						for (int ci = 0; ci < NUM_TILES; ++ci) {
-							int c = (c0+ci) % NUM_TILES; // Current tile
+						int c0 = rand() % (Tiles->NumTiles());
+						for (unsigned int ci = 0; ci < Tiles->NumTiles(); ++ci) {
+							int c = (c0+ci) % (Tiles->NumTiles()); // Current tile
 							int e = 0;  // Error
 
+							// Checking the tile to the left
 							if (x > 0) {
 								int d = Cells[(x-1)+y*Width].TileID;
-								e += EdgesMatchError(Tiles[d].EdgeRight,
-									Tiles[c].EdgeLeft)*3;
+								e += Tiles->EdgesMatchError(Tiles->EdgeRight(d),
+									Tiles->EdgeLeft(c))*3;
 							} else {
 								int d = Cells[(x+1)+y*Width].TileID;
-								e += EdgesMatchError(HMirrorEdge(Tiles[d].EdgeLeft),
-									Tiles[c].EdgeLeft)*3; // Mirror
+								e += Tiles->EdgesMatchError(Tiles->HMirrorEdge(Tiles->EdgeLeft(d)),
+									Tiles->EdgeLeft(c))*3; // Mirror
 							}
 
+							// Checking the tile to the right
 							if (x < Width - 1) {
 								int d = Cells[(x+1)+y*Width].TileID;
-								e += EdgesMatchError(Tiles[c].EdgeRight,
-									 Tiles[d].EdgeLeft)*3;
+								e += Tiles->EdgesMatchError(Tiles->EdgeRight(c),
+									 Tiles->EdgeLeft(d))*3;
 							} else {
 								int d = Cells[(x-1)+y*Width].TileID;
-								e += EdgesMatchError(Tiles[c].EdgeRight,
-									HMirrorEdge(Tiles[d].EdgeRight))*3; // Mirror
+								e += Tiles->EdgesMatchError(Tiles->EdgeRight(c),
+									Tiles->HMirrorEdge(Tiles->EdgeRight(d)))*3; // Mirror
 							}
 
+							// Checking the tile above
 							if (y > 0) {
 								int d = Cells[x+(y-1)*Width].TileID;
-								e += EdgesMatchError(Tiles[d].EdgeDown,
-									Tiles[c].EdgeUp)*3;
+								e += Tiles->EdgesMatchError(Tiles->EdgeDown(d),
+									Tiles->EdgeUp(c))*3;
 							} else {
 								int d = Cells[x+(y+1)*Width].TileID;
-								e += EdgesMatchError(VMirrorEdge(Tiles[d].EdgeUp),
-									Tiles[c].EdgeUp)*3; // Mirror
+								e += Tiles->EdgesMatchError(Tiles->VMirrorEdge(Tiles->EdgeUp(d)),
+									Tiles->EdgeUp(c))*3; // Mirror
 							}
 
+							// Checking the tile below
 							if (y < Height - 1) {
 								int d = Cells[x+(y+1)*Width].TileID;
-								e += EdgesMatchError(Tiles[c].EdgeDown,
-									Tiles[d].EdgeUp)*3;
+								e += Tiles->EdgesMatchError(Tiles->EdgeDown(c),
+									Tiles->EdgeUp(d))*3;
 							} else {
 								int d = Cells[x+(y-1)*Width].TileID;
-								e += EdgesMatchError(Tiles[c].EdgeDown,
-									VMirrorEdge(Tiles[d].EdgeDown))*3; // Mirror
+								e += Tiles->EdgesMatchError(Tiles->EdgeDown(c),
+									Tiles->VMirrorEdge(Tiles->EdgeDown(d)))*3; // Mirror
 							}
 
 							if (best_err == -1 || e < best_err) {
@@ -375,9 +450,9 @@ struct Map {
 					for (unsigned int x=0; x<Width; ++x) {
 						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].Fixed) {
 							if (Cells[x+y*Width].Elevation >= 0) {
-								Cells[x+y*Width].TileID = TILE_SOLID;
+								Cells[x+y*Width].TileID = Tiles->SolidTile();
 							} else {
-								Cells[x+y*Width].TileID = TILE_EMPTY;
+								Cells[x+y*Width].TileID = Tiles->EmptyTile();
 							}
 						}
 					}
@@ -411,15 +486,15 @@ struct Map {
 				if (!u && !d && !l && !r) c = false;
 				if (u && d && l && r) c = true;
 
-				Cells[x+y*Width].TileID = TILE_SOLID;
+				Cells[x+y*Width].TileID = Tiles->SolidTile();
 				Cells[x+y*Width].Fixed = false;
 				if (c & u & d & l & r) {
-					Cells[x+y*Width].TileID = TILE_SOLID;
+					Cells[x+y*Width].TileID = Tiles->SolidTile();
 					//if (ul & ur & dl & dr) {
 					//	Cells[x+y*Width].Fixed = true;
 					//}
 				} else if (!c & !u & !d & !l & !r) {
-					Cells[x+y*Width].TileID = TILE_EMPTY;
+					Cells[x+y*Width].TileID = Tiles->EmptyTile();
 					//if (!ul & !ur & !dl & !dr) {
 					//	Cells[x+y*Width].Fixed = true;
 					//}
@@ -428,24 +503,7 @@ struct Map {
 						(ul?0x100:0)+( u?0x080:0)+(ur?0x040:0)+
 						( l?0x020:0)+( c?0x010:0)+( r?0x008:0)+
 						(dl?0x004:0)+( d?0x002:0)+(dr?0x001:0);
-					switch (env) {
-						case 0b000000111: Cells[x+y*Width].TileID = TILE_HALF_U; break;
-						case 0b111000000: Cells[x+y*Width].TileID = TILE_HALF_D; break;
-						case 0b001001001: Cells[x+y*Width].TileID = TILE_HALF_L; break;
-						case 0b100100100: Cells[x+y*Width].TileID = TILE_HALF_R; break;
-						case 0b000001011: Cells[x+y*Width].TileID = TILE_HALF_UL; break;
-						case 0b000100110: Cells[x+y*Width].TileID = TILE_HALF_UR; break;
-						case 0b011001000: Cells[x+y*Width].TileID = TILE_HALF_DL; break;
-						case 0b110100000: Cells[x+y*Width].TileID = TILE_HALF_DR; break;
-						case 0b000000001: Cells[x+y*Width].TileID = TILE_ECOR_UL; break;
-						case 0b000000100: Cells[x+y*Width].TileID = TILE_ECOR_UR; break;
-						case 0b001000000: Cells[x+y*Width].TileID = TILE_ECOR_DL; break;
-						case 0b100000000: Cells[x+y*Width].TileID = TILE_ECOR_DR; break;
-						case 0b111100100: Cells[x+y*Width].TileID = TILE_SCOR_UL; break;
-						case 0b111001001: Cells[x+y*Width].TileID = TILE_SCOR_UR; break;
-						case 0b100100111: Cells[x+y*Width].TileID = TILE_SCOR_DL; break;
-						case 0b001001111: Cells[x+y*Width].TileID = TILE_SCOR_DR; break;
-					}
+					Cells[x+y*Width].TileID = Tiles->InitialTileGuess(env);
 				}
 			}
 		}
@@ -477,7 +535,7 @@ struct Map {
 
 	unsigned int Width;
 	unsigned int Height;
-	const TileConfig *Tiles;
+	const TileSet * Tiles;
 	MapCell *Cells;
 	signed int MaxElevation;
 	signed int MinElevation;
@@ -487,6 +545,7 @@ int main()
 {
 	srand((unsigned)time(0));
 
+	TileSet tiles;
 	Map map(32, 24, tiles);
 	map.Random();
 
@@ -494,11 +553,11 @@ int main()
 	sf::RenderWindow App(sf::VideoMode(1024, 768, 32), "SFML TileMap");
 
 	// Load the sprite images and create the sprited
-	sf::Image tiles_images[NUM_TILES];
-	sf::Sprite tiles_sprites[NUM_TILES];
-	for (int i=0; i<NUM_TILES;++i) {
+	sf::Image tiles_images[tiles.NumTiles()];
+	sf::Sprite tiles_sprites[tiles.NumTiles()];
+	for (unsigned int i=0; i<tiles.NumTiles();++i) {
 		//printf("Loading '%s'\n", tiles[i].FileName);
-		if (!tiles_images[i].LoadFromFile(tiles[i].FileName)) {
+		if (!tiles_images[i].LoadFromFile(tiles.FileName(i))) {
 			return EXIT_FAILURE;
 		}
 		tiles_images[i].SetSmooth(false);
