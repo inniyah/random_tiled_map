@@ -455,7 +455,7 @@ struct Map {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
 						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].Fixed) {
-							if (Cells[x+y*Width].Elevation >= 0) {
+							if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
 								Cells[x+y*Width].TileID = Tiles->SolidTile();
 							} else {
 								Cells[x+y*Width].TileID = Tiles->EmptyTile();
@@ -474,21 +474,21 @@ struct Map {
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
 				if (!Cells[x + y*Width].Fixed) {
-
+	
 					unsigned int xm = x > 0        ? x - 1 : x;
 					unsigned int xp = x < Width-1  ? x + 1 : x;
 					unsigned int ym = y > 0        ? y - 1 : y;
 					unsigned int yp = y < Height-1 ? y + 1 : y;
 
-					bool c =  (Cells[ x  + y  *Width].Elevation >= 0);
-					bool l =  (Cells[ xm + y  *Width].Elevation >= 0);
-					bool r =  (Cells[ xp + y  *Width].Elevation >= 0);
-					bool u =  (Cells[ x  + yp *Width].Elevation >= 0);
-					bool d =  (Cells[ x  + ym *Width].Elevation >= 0);
-					bool ul = (Cells[ xm + yp *Width].Elevation >= 0);
-					bool ur = (Cells[ xp + yp *Width].Elevation >= 0);
-					bool dl = (Cells[ xm + ym *Width].Elevation >= 0);
-					bool dr = (Cells[ xp + ym *Width].Elevation >= 0);
+					bool c =  (Cells[ x  + y  *Width].Elevation >= CurrentLayer->Elevation);
+					bool l =  (Cells[ xm + y  *Width].Elevation >= CurrentLayer->Elevation);
+					bool r =  (Cells[ xp + y  *Width].Elevation >= CurrentLayer->Elevation);
+					bool u =  (Cells[ x  + yp *Width].Elevation >= CurrentLayer->Elevation);
+					bool d =  (Cells[ x  + ym *Width].Elevation >= CurrentLayer->Elevation);
+					bool ul = (Cells[ xm + yp *Width].Elevation >= CurrentLayer->Elevation);
+					bool ur = (Cells[ xp + yp *Width].Elevation >= CurrentLayer->Elevation);
+					bool dl = (Cells[ xm + ym *Width].Elevation >= CurrentLayer->Elevation);
+					bool dr = (Cells[ xp + ym *Width].Elevation >= CurrentLayer->Elevation);
 
 					if (!u && !d && !l && !r) c = false;
 					if (u && d && l && r) c = true;
@@ -565,7 +565,7 @@ int main()
 	Map map(32, 24, -100, 100);
 	map.Random();
 
-	MapLayer layer = {&tiles , -50};
+	MapLayer layer = {&tiles , 0};
 	map.SetCurrentLayer(layer);
 	map.AddTilesInLayer();
 
