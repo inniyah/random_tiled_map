@@ -310,9 +310,14 @@ struct MapCell {
 	bool Fixed;
 };
 
+struct MapLayer {
+	const TileSet * Tiles;
+	signed int Elevation;
+};
+
 struct Map {
-	Map(unsigned int w, unsigned int h, const TileSet & tile_set) :
-	Width(w), Height(h), Tiles(&tile_set), MaxElevation(100), MinElevation(-100) {
+	Map(unsigned int w, unsigned int h, signed int min_elev, signed int max_elev) :
+	Width(w), Height(h), CurrentLayer(NULL), MaxElevation(max_elev), MinElevation(min_elev) {
 		Cells = new MapCell[h*w];
 		memset(Cells, 0, h*w*sizeof(MapCell));
 	}
@@ -364,8 +369,8 @@ struct Map {
 	};
 
 	bool AdjustTiles(unsigned int iterations = 200) {
+		const TileSet * Tiles = CurrentLayer->Tiles;
 		bool tiles_ok[Width * Height];
-		unsigned int min_wrong;
 		for (unsigned int k=0; k<iterations; ++k) {
 			unsigned int changes = 0;
 			unsigned int wrong = 0;
@@ -432,7 +437,8 @@ struct Map {
 								best_tile = c;
 								best_err = e;
 							}
-						}
+						} // for (unsigned int ci = 0; ci < Tiles->NumTiles(); ++ci)
+
 						if (Cells[x+y*Width].TileID != best_tile) ++changes;
 						Cells[x+y*Width].TileID = best_tile;
 						if (best_err) {
@@ -441,11 +447,11 @@ struct Map {
 						} else {
 							tiles_ok[x+y*Width] = true;
 						}
-					}
-				}
-			}
+					} // if (!Cells[x + y*Width].Fixed)
+				} // for (unsigned int xi=0; xi<Width; ++xi)
+			} // for (unsigned int yi=0; yi<Height; ++yi)
 			printf("Iter=%d, Changes= %d, Wrong=%d\n", k, changes, wrong);
-			if (wrong && (!changes || (min_wrong ? wrong >= min_wrong : false))) {
+			if (wrong && !changes) {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
 						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].Fixed) {
@@ -459,60 +465,63 @@ struct Map {
 				}
 			}
 			if (!changes && !wrong) return true; // No wrong tiles
-			if (min_wrong || wrong < min_wrong) min_wrong = wrong;
-		}
+		} // for (unsigned int k=0; k<iterations; ++k
 		return false; // We still have wrong tiles, but we give up
 	}
 
-	void SetupTiles() {
+	void SetupInitialTiles() {
+		const TileSet * Tiles = CurrentLayer->Tiles;
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
+				if (!Cells[x + y*Width].Fixed) {
 
-				unsigned int xm = x > 0        ? x - 1 : x;
-				unsigned int xp = x < Width-1  ? x + 1 : x;
-				unsigned int ym = y > 0        ? y - 1 : y;
-				unsigned int yp = y < Height-1 ? y + 1 : y;
+					unsigned int xm = x > 0        ? x - 1 : x;
+					unsigned int xp = x < Width-1  ? x + 1 : x;
+					unsigned int ym = y > 0        ? y - 1 : y;
+					unsigned int yp = y < Height-1 ? y + 1 : y;
 
-				bool c =  (Cells[ x  + y  *Width].Elevation >= 0);
-				bool l =  (Cells[ xm + y  *Width].Elevation >= 0);
-				bool r =  (Cells[ xp + y  *Width].Elevation >= 0);
-				bool u =  (Cells[ x  + yp *Width].Elevation >= 0);
-				bool d =  (Cells[ x  + ym *Width].Elevation >= 0);
-				bool ul = (Cells[ xm + yp *Width].Elevation >= 0);
-				bool ur = (Cells[ xp + yp *Width].Elevation >= 0);
-				bool dl = (Cells[ xm + ym *Width].Elevation >= 0);
-				bool dr = (Cells[ xp + ym *Width].Elevation >= 0);
+					bool c =  (Cells[ x  + y  *Width].Elevation >= 0);
+					bool l =  (Cells[ xm + y  *Width].Elevation >= 0);
+					bool r =  (Cells[ xp + y  *Width].Elevation >= 0);
+					bool u =  (Cells[ x  + yp *Width].Elevation >= 0);
+					bool d =  (Cells[ x  + ym *Width].Elevation >= 0);
+					bool ul = (Cells[ xm + yp *Width].Elevation >= 0);
+					bool ur = (Cells[ xp + yp *Width].Elevation >= 0);
+					bool dl = (Cells[ xm + ym *Width].Elevation >= 0);
+					bool dr = (Cells[ xp + ym *Width].Elevation >= 0);
 
-				if (!u && !d && !l && !r) c = false;
-				if (u && d && l && r) c = true;
+					if (!u && !d && !l && !r) c = false;
+					if (u && d && l && r) c = true;
 
-				Cells[x+y*Width].TileID = Tiles->SolidTile();
-				Cells[x+y*Width].Fixed = false;
-				if (c & u & d & l & r) {
 					Cells[x+y*Width].TileID = Tiles->SolidTile();
-					//if (ul & ur & dl & dr) {
-					//	Cells[x+y*Width].Fixed = true;
-					//}
-				} else if (!c & !u & !d & !l & !r) {
-					Cells[x+y*Width].TileID = Tiles->EmptyTile();
-					//if (!ul & !ur & !dl & !dr) {
-					//	Cells[x+y*Width].Fixed = true;
-					//}
-				} else {
-					uint32_t env =
-						(ul?0x100:0)+( u?0x080:0)+(ur?0x040:0)+
-						( l?0x020:0)+( c?0x010:0)+( r?0x008:0)+
-						(dl?0x004:0)+( d?0x002:0)+(dr?0x001:0);
-					Cells[x+y*Width].TileID = Tiles->InitialTileGuess(env);
-				}
-			}
-		}
+					Cells[x+y*Width].Fixed = false;
+					if (c & u & d & l & r) {
+						Cells[x+y*Width].TileID = Tiles->SolidTile();
+						//if (ul & ur & dl & dr) {
+						//	Cells[x+y*Width].Fixed = true;
+						//}
+					} else if (!c & !u & !d & !l & !r) {
+						Cells[x+y*Width].TileID = Tiles->EmptyTile();
+						//if (!ul & !ur & !dl & !dr) {
+						//	Cells[x+y*Width].Fixed = true;
+						//}
+					} else {
+						uint32_t env =
+							(ul?0x100:0)+( u?0x080:0)+(ur?0x040:0)+
+							( l?0x020:0)+( c?0x010:0)+( r?0x008:0)+
+							(dl?0x004:0)+( d?0x002:0)+(dr?0x001:0);
+						Cells[x+y*Width].TileID = Tiles->InitialTileGuess(env);
+					}
+				} // if (!Cells[x + y*Width].Fixed)
+			} // for (unsigned int x=0; x<Width; ++x)
+		} // for (unsigned int y=0; y<Height; ++y)
 	}
 
-	bool Random() {
+	void Random() {
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
 				Cells[x+y*Width].Elevation = MinElevation + (rand() % (MaxElevation - MinElevation));
+				Cells[x+y*Width].Fixed = false;
 			}
 		}
 
@@ -525,17 +534,24 @@ struct Map {
 			printf("\n");
 		}
 		printf("\n");
+	}
 
+	bool AddTilesInLayer()
+	{
 		for (unsigned int tries = 0 ; tries < 1; ++tries) {
-			SetupTiles();
+			SetupInitialTiles();
 			if (AdjustTiles()) return true;
 		}
 		return false;
 	}
 
+	inline void SetCurrentLayer(MapLayer & layer) {
+		CurrentLayer = &layer;
+	}
+
 	unsigned int Width;
 	unsigned int Height;
-	const TileSet * Tiles;
+	const MapLayer * CurrentLayer;
 	MapCell *Cells;
 	signed int MaxElevation;
 	signed int MinElevation;
@@ -546,8 +562,12 @@ int main()
 	srand((unsigned)time(0));
 
 	TileSet tiles;
-	Map map(32, 24, tiles);
+	Map map(32, 24, -100, 100);
 	map.Random();
+
+	MapLayer layer = {&tiles , -50};
+	map.SetCurrentLayer(layer);
+	map.AddTilesInLayer();
 
 	// Create the main rendering window
 	sf::RenderWindow App(sf::VideoMode(1024, 768, 32), "SFML TileMap");
