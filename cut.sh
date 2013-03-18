@@ -1,8 +1,20 @@
 #!/bin/bash
 
-mkdir -p tiles
+if [ ! -z "$1" ]; then
+	src=tiles$1.png
+	dir=tiles/$1
+else
+	src=tiles.png
+	dir=tiles
+fi
 
-src=tiles.png
+if [ ! -f "${src}" ]; then
+	echo "'${src}' doesn't exist."
+	exit
+fi
+
+mkdir -p ${dir}
+
 cut=cutdata.txt
 
 width=`identify -format %w $src`
@@ -15,7 +27,7 @@ if test ! -z "$line"; then
 	y=`echo "${line}" | awk -F: '{print $3}'`
 
 	time1=$(($(date +%s%N)/1000000))
-	tile=tiles/${n}.png
+	tile=${dir}/${n}.png
 	echo -n $tile
 	w=$((x * 32))
 	h=$((y * 32))
