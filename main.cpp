@@ -33,6 +33,14 @@
 
 class TileSet {
 public:
+	TileSet() : TileRuntimeData(NULL) {
+		TileRuntimeData = new TileRuntime[TileDataNumAllTiles];
+	}
+
+	~TileSet() {
+		if (TileRuntimeData) delete[] TileRuntimeData;
+	}
+
 	enum {
 		// B(lock) + S(olid)/E(mpty) + U(p)/D(own)/L(eft)/R(ight)
 		BS = 1 << 0, BSU = 1 << 1, BSD = 1 << 2, BSL = 1 << 3, BSR = 1 << 4,
@@ -94,36 +102,65 @@ public:
 		int Fill;
 	};
 
-	static const TileConfig TileData[];
+	struct TileRuntime {
+		sf::Image Image;
+		sf::Sprite Sprite;
+	};
+
+	static const TileConfig TileConfigData[];
 	static unsigned int TileDataNumAllTiles;
 
-	unsigned int NumTiles() const {
+	TileRuntime * TileRuntimeData;
+
+	inline unsigned int NumTiles() const {
 		return TileDataNumAllTiles;
 	}
 
-	inline const TileConfig &getTile(unsigned int index) const {
-		return TileData[index];
+	inline const TileConfig &getTileConfig(unsigned int index) const {
+		return TileConfigData[index];
 	}
-	inline const char * FileName(unsigned int index) const {
-		return TileData[index].FileName;
+	inline const char * BaseFileName(unsigned int index) const {
+		return TileConfigData[index].FileName;
 	}
 	inline uint32_t SolidFlags(unsigned int index) const {
-		return TileData[index].SolidFlags;
+		return TileConfigData[index].SolidFlags;
 	}
 	inline int EdgeUp(unsigned int index) const {
-		return TileData[index].EdgeUp;
+		return TileConfigData[index].EdgeUp;
 	}
 	inline int EdgeDown(unsigned int index) const {
-		return TileData[index].EdgeDown;
+		return TileConfigData[index].EdgeDown;
 	}
 	inline int EdgeLeft(unsigned int index) const {
-		return TileData[index].EdgeLeft;
+		return TileConfigData[index].EdgeLeft;
 	}
 	inline int EdgeRight(unsigned int index) const {
-		return TileData[index].EdgeRight;
+		return TileConfigData[index].EdgeRight;
 	}
 	inline int Fill(unsigned int index) const {
-		return TileData[index].Fill;
+		return TileConfigData[index].Fill;
+	}
+
+	inline sf::Image & GetImage(unsigned int index) {
+		return TileRuntimeData[index].Image;
+	}
+
+	inline sf::Sprite & GetSprite(unsigned int index) {
+		return TileRuntimeData[index].Sprite;
+	}
+
+	bool LoadTileImages(const char * base_dir) { // Load the sprite images and create the sprites
+		for (unsigned int i = 0; i < NumTiles(); ++i) {
+			char filename[32];
+			snprintf(filename, sizeof(filename), "%s/%s", base_dir, BaseFileName(i));
+			printf("Loading '%s'\n", filename);
+			if (!TileRuntimeData[i].Image.LoadFromFile(filename)) {
+				return false;
+			}
+			TileRuntimeData[i].Image.SetSmooth(false);
+			TileRuntimeData[i].Sprite = sf::Sprite(TileRuntimeData[i].Image);
+		}
+		return true;
 	}
 
 	enum {
@@ -201,11 +238,9 @@ public:
 		}
 	}
 
-private:
-
 };
 
-const TileSet::TileConfig TileSet::TileData[] = {
+const TileSet::TileConfig TileSet::TileConfigData[] = {
 	// FileName         SolidFlags          EdgeUp       EdgeDown     EdgeLeft     EdgeRight    Fill
 	{ "A1.png",  BE+BEU+BED+BER+BEL, EMPTY,       EMPTY,       EMPTY,       EMPTY       ,   0 }, // 00 " "
 	{ "A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,       SOLID,       SOLID,       SOLID       , 100 }, // 01 "█"
@@ -323,7 +358,7 @@ const TileSet::TileConfig TileSet::TileData[] = {
 	{ "L24.png", BER,                HCOR_LEFTT,  HCOR_LEFTT,  SBICORNERT,  EMPTY       ,  40 }, // 103
 };
 
-unsigned int TileSet::TileDataNumAllTiles = sizeof(TileSet::TileData) / sizeof(TileSet::TileConfig);
+unsigned int TileSet::TileDataNumAllTiles = sizeof(TileSet::TileConfigData) / sizeof(TileSet::TileConfig);
 
 struct MapCell {
 	signed int Elevation;
@@ -588,6 +623,9 @@ int main()
 	srand((unsigned)time(0));
 
 	TileSet tiles;
+	if (!tiles.LoadTileImages("tiles"))
+		return EXIT_FAILURE;
+
 	Map map(32, 24, -100, 100);
 	map.Random();
 
@@ -597,20 +635,6 @@ int main()
 
 	// Create the main rendering window
 	sf::RenderWindow App(sf::VideoMode(1024, 768, 32), "SFML TileMap");
-
-	// Load the sprite images and create the sprited
-	sf::Image tiles_images[tiles.NumTiles()];
-	sf::Sprite tiles_sprites[tiles.NumTiles()];
-	for (unsigned int i=0; i<tiles.NumTiles();++i) {
-		char filename[32];
-		snprintf(filename, sizeof(filename), "%s/%s", layer.BaseDir, tiles.FileName(i));
-		printf("Loading '%s'\n", filename);
-		if (!tiles_images[i].LoadFromFile(filename)) {
-			return EXIT_FAILURE;
-		}
-		tiles_images[i].SetSmooth(false);
-		tiles_sprites[i] = sf::Sprite(tiles_images[i]);
-	}
 
 	// Start game loop
 	while (App.IsOpened()) {
@@ -629,14 +653,14 @@ int main()
 			for (unsigned int x=0; x<map.getWidth(); ++x) {
 				int tile_id = map.Cells[x+y*map.getWidth()].TileID;
 				// Get the tile's image
-				const sf::Image* image = tiles_sprites[tile_id].GetImage();
+				const sf::Image* image = tiles.GetSprite(tile_id).GetImage();
 				// Get the width and height of the image
 				int width = image->GetWidth();
 				int height = image->GetHeight();
 				// Adjust the offset by using the width
-				tiles_sprites[tile_id].SetPosition(x * width, y * height);
+				tiles.GetSprite(tile_id).SetPosition(x * width, y * height);
 				// Draw the tile
-				App.Draw(tiles_sprites[tile_id]);
+				App.Draw(tiles.GetSprite(tile_id));
 			}
 		}
 
