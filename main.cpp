@@ -31,6 +31,7 @@
 #include <cstring>
 #include <cmath>
 
+#define TILES_DIR "tiles"
 
 class TileSet {
 public:
@@ -186,120 +187,120 @@ private:
 
 const TileSet::TileConfig TileSet::TileData[] = {
 	// FileName         SolidFlags          EdgeUp       EdgeDown     EdgeLeft     EdgeRight    Fill
-	{ "tiles/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,       EMPTY,       EMPTY,       EMPTY       ,   0 }, // " "
-	{ "tiles/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,       SOLID,       SOLID,       SOLID       , 100 }, // "█"
-	{ "tiles/B1.png",  BEU+BSD,            EMPTY,       SOLID,       HALF_DOWN,   HALF_DOWN   ,  50 }, // "▄"
-	{ "tiles/B2.png",  BER+BSL,            HALF_LEFT,   HALF_LEFT,   SOLID,       EMPTY       ,  50 }, // "▌"
-	{ "tiles/B3.png",  BED+BSU,            SOLID,       EMPTY,       HALF_UP,     HALF_UP     ,  50 }, // "▀"
-	{ "tiles/B4.png",  BEL+BSR,            HALF_RIGHT,  HALF_RIGHT,  EMPTY,       SOLID       ,  50 }, // "▐"
-	{ "tiles/C11.png", BEU+BEL,            EMPTY,       HALF_RIGHT,  EMPTY,       HALF_DOWN   ,  25 }, // "▗"
-	{ "tiles/C12.png", BEU+BER,            EMPTY,       HALF_LEFT,   HALF_DOWN,   EMPTY       ,  25 }, // "▖"
-	{ "tiles/C13.png", BED+BER,            HALF_LEFT,   EMPTY,       HALF_UP,     EMPTY       ,  25 }, // "▘"
-	{ "tiles/C14.png", BED+BEL,            HALF_RIGHT,  EMPTY,       EMPTY,       HALF_UP     ,  25 }, // "▝"
-	{ "tiles/C21.png", BSU+BSL,            SOLID,       HALF_LEFT,   SOLID,       HALF_UP     ,  75 }, // "▛"
-	{ "tiles/C22.png", BSU+BSR,            SOLID,       HALF_RIGHT,  HALF_UP,     SOLID       ,  75 }, // "▜"
-	{ "tiles/C23.png", BSD+BSR,            HALF_RIGHT,  SOLID,       HALF_DOWN,   SOLID       ,  75 }, // "▟"
-	{ "tiles/C24.png", BSD+BSL,            HALF_LEFT,   SOLID,       SOLID,       HALF_DOWN   ,  75 }, // "▙"
+	{ TILES_DIR "/A1.png",  BE+BEU+BED+BER+BEL, EMPTY,       EMPTY,       EMPTY,       EMPTY       ,   0 }, // " "
+	{ TILES_DIR "/A2.png",  BS+BSU+BSD+BSR+BSL, SOLID,       SOLID,       SOLID,       SOLID       , 100 }, // "█"
+	{ TILES_DIR "/B1.png",  BEU+BSD,            EMPTY,       SOLID,       HALF_DOWN,   HALF_DOWN   ,  50 }, // "▄"
+	{ TILES_DIR "/B2.png",  BER+BSL,            HALF_LEFT,   HALF_LEFT,   SOLID,       EMPTY       ,  50 }, // "▌"
+	{ TILES_DIR "/B3.png",  BED+BSU,            SOLID,       EMPTY,       HALF_UP,     HALF_UP     ,  50 }, // "▀"
+	{ TILES_DIR "/B4.png",  BEL+BSR,            HALF_RIGHT,  HALF_RIGHT,  EMPTY,       SOLID       ,  50 }, // "▐"
+	{ TILES_DIR "/C11.png", BEU+BEL,            EMPTY,       HALF_RIGHT,  EMPTY,       HALF_DOWN   ,  25 }, // "▗"
+	{ TILES_DIR "/C12.png", BEU+BER,            EMPTY,       HALF_LEFT,   HALF_DOWN,   EMPTY       ,  25 }, // "▖"
+	{ TILES_DIR "/C13.png", BED+BER,            HALF_LEFT,   EMPTY,       HALF_UP,     EMPTY       ,  25 }, // "▘"
+	{ TILES_DIR "/C14.png", BED+BEL,            HALF_RIGHT,  EMPTY,       EMPTY,       HALF_UP     ,  25 }, // "▝"
+	{ TILES_DIR "/C21.png", BSU+BSL,            SOLID,       HALF_LEFT,   SOLID,       HALF_UP     ,  75 }, // "▛"
+	{ TILES_DIR "/C22.png", BSU+BSR,            SOLID,       HALF_RIGHT,  HALF_UP,     SOLID       ,  75 }, // "▜"
+	{ TILES_DIR "/C23.png", BSD+BSR,            HALF_RIGHT,  SOLID,       HALF_DOWN,   SOLID       ,  75 }, // "▟"
+	{ TILES_DIR "/C24.png", BSD+BSL,            HALF_LEFT,   SOLID,       SOLID,       HALF_DOWN   ,  75 }, // "▙"
 
 	// Open Corners
-	{ "tiles/D11.png", BSD+BEU,            EMPTY,       SCOR_LEFTN,  ECOR_DOWNN,  HALF_DOWN   ,  35 },
-	{ "tiles/D12.png", BSD+BEU,            EMPTY,       SCOR_RIGHTN, HALF_DOWN,   ECOR_DOWNN  ,  35 },
-	{ "tiles/D13.png", BSL+BER,            ECOR_LEFTN,  HALF_LEFT,   SCOR_UPN,    EMPTY       ,  35 },
-	{ "tiles/D14.png", BSL+BER,            HALF_LEFT,   ECOR_LEFTN,  SCOR_DOWNN,  EMPTY       ,  35 },
-	{ "tiles/D15.png", BSU+BED,            SCOR_RIGHTN, EMPTY,       HALF_UP,     ECOR_UPN    ,  35 },
-	{ "tiles/D16.png", BSU+BED,            SCOR_LEFTN,  EMPTY,       ECOR_UPN,    HALF_UP     ,  35 },
-	{ "tiles/D17.png", BSR+BEL,            HALF_RIGHT,  ECOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  35 },
-	{ "tiles/D18.png", BSR+BEL,            ECOR_RIGHTN, HALF_RIGHT,  EMPTY,       SCOR_UPN    ,  35 },
-	{ "tiles/D21.png", BED+BSU,            SOLID,       ECOR_LEFTN,  SCOR_DOWNN,  HALF_UP     ,  65 },
-	{ "tiles/D22.png", BED+BSU,            SOLID,       ECOR_RIGHTN, HALF_UP,     SCOR_UPN    ,  65 },
-	{ "tiles/D23.png", BEL+BSR,            SCOR_LEFTN,  HALF_RIGHT,  ECOR_UPN,    SOLID       ,  65 },
-	{ "tiles/D24.png", BEL+BSR,            HALF_RIGHT,  SCOR_LEFTN,  ECOR_DOWNN,  SOLID       ,  65 },
-	{ "tiles/D25.png", BEU+BSD,            ECOR_RIGHTN, SOLID,       HALF_DOWN,   SCOR_UPN    ,  65 },
-	{ "tiles/D26.png", BEU+BSD,            ECOR_LEFTN,  SOLID,       SCOR_UPN,    HALF_DOWN   ,  65 },
-	{ "tiles/D27.png", BER+BSL,            HALF_LEFT,   SCOR_RIGHTN, SOLID,       ECOR_DOWNN  ,  65 },
-	{ "tiles/D28.png", BER+BSL,            SCOR_RIGHTN, HALF_LEFT,   SOLID,       ECOR_UPN    ,  65 },
+	{ TILES_DIR "/D11.png", BSD+BEU,            EMPTY,       SCOR_LEFTN,  ECOR_DOWNN,  HALF_DOWN   ,  35 },
+	{ TILES_DIR "/D12.png", BSD+BEU,            EMPTY,       SCOR_RIGHTN, HALF_DOWN,   ECOR_DOWNN  ,  35 },
+	{ TILES_DIR "/D13.png", BSL+BER,            ECOR_LEFTN,  HALF_LEFT,   SCOR_UPN,    EMPTY       ,  35 },
+	{ TILES_DIR "/D14.png", BSL+BER,            HALF_LEFT,   ECOR_LEFTN,  SCOR_DOWNN,  EMPTY       ,  35 },
+	{ TILES_DIR "/D15.png", BSU+BED,            SCOR_RIGHTN, EMPTY,       HALF_UP,     ECOR_UPN    ,  35 },
+	{ TILES_DIR "/D16.png", BSU+BED,            SCOR_LEFTN,  EMPTY,       ECOR_UPN,    HALF_UP     ,  35 },
+	{ TILES_DIR "/D17.png", BSR+BEL,            HALF_RIGHT,  ECOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  35 },
+	{ TILES_DIR "/D18.png", BSR+BEL,            ECOR_RIGHTN, HALF_RIGHT,  EMPTY,       SCOR_UPN    ,  35 },
+	{ TILES_DIR "/D21.png", BED+BSU,            SOLID,       ECOR_LEFTN,  SCOR_DOWNN,  HALF_UP     ,  65 },
+	{ TILES_DIR "/D22.png", BED+BSU,            SOLID,       ECOR_RIGHTN, HALF_UP,     SCOR_UPN    ,  65 },
+	{ TILES_DIR "/D23.png", BEL+BSR,            SCOR_LEFTN,  HALF_RIGHT,  ECOR_UPN,    SOLID       ,  65 },
+	{ TILES_DIR "/D24.png", BEL+BSR,            HALF_RIGHT,  SCOR_LEFTN,  ECOR_DOWNN,  SOLID       ,  65 },
+	{ TILES_DIR "/D25.png", BEU+BSD,            ECOR_RIGHTN, SOLID,       HALF_DOWN,   SCOR_UPN    ,  65 },
+	{ TILES_DIR "/D26.png", BEU+BSD,            ECOR_LEFTN,  SOLID,       SCOR_UPN,    HALF_DOWN   ,  65 },
+	{ TILES_DIR "/D27.png", BER+BSL,            HALF_LEFT,   SCOR_RIGHTN, SOLID,       ECOR_DOWNN  ,  65 },
+	{ TILES_DIR "/D28.png", BER+BSL,            SCOR_RIGHTN, HALF_LEFT,   SOLID,       ECOR_UPN    ,  65 },
 
 	// Oblique Tiles
-	{ "tiles/E1.png",  BEU+BSR+BSD+BEL,    ECOR_RIGHTN, SCOR_LEFTN,  ECOR_DOWNN,  SCOR_UPN    ,  50 },
-	{ "tiles/E2.png",  BEU+BER+BSD+BSL,    ECOR_LEFTN,  SCOR_RIGHTN, SCOR_UPN,    ECOR_DOWNN  ,  50 },
-	{ "tiles/E3.png",  BSU+BER+BED+BSL,    SCOR_RIGHTN, ECOR_LEFTN,  SCOR_DOWNN,  ECOR_UPN    ,  50 },
-	{ "tiles/E4.png",  BSU+BSR+BED+BEL,    SCOR_LEFTN,  ECOR_RIGHTN, ECOR_UPN,    SCOR_DOWNN  ,  50 },
-	{ "tiles/F11.png", BE+BEU+BED+BER+BEL, ECOR_LEFTT,  EMPTY,       ECOR_UPT,    EMPTY       ,   5 }, // "⦍"
-	{ "tiles/F12.png", BE+BEU+BED+BER+BEL, ECOR_RIGHTT, EMPTY,       EMPTY,       ECOR_UPT    ,   5 }, // "⦐"
-	{ "tiles/F13.png", BE+BEU+BED+BER+BEL, EMPTY,       ECOR_RIGHTT, EMPTY,       ECOR_DOWNT  ,   5 }, // "⦎"
-	{ "tiles/F14.png", BE+BEU+BED+BER+BEL, EMPTY,       ECOR_LEFTT,  ECOR_DOWNT,  EMPTY       ,   5 }, // "⦏"
-	{ "tiles/F15.png", BE+BEU+BED+BER+BEL, ECOR_LEFTT,  ECOR_RIGHTT, ECOR_UPT,    ECOR_DOWNT  ,  10 },
-	{ "tiles/F16.png", BE+BEU+BED+BER+BEL, ECOR_RIGHTT, ECOR_LEFTT,  ECOR_DOWNT,  ECOR_UPT    ,  10 },
-	{ "tiles/F21.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFTT,  SOLID,       SCOR_UPT,    SOLID       ,  95 }, // "⦍"
-	{ "tiles/F22.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHTT, SOLID,       SOLID,       SCOR_UPT    ,  95 }, // "⦐"
-	{ "tiles/F23.png", BS+BSU+BSD+BSR+BSL, SOLID,       SCOR_RIGHTT, SOLID,       SCOR_DOWNT  ,  95 }, // "⦎"
-	{ "tiles/F24.png", BS+BSU+BSD+BSR+BSL, SOLID,       SCOR_LEFTT,  SCOR_DOWNT,  SOLID       ,  95 }, // "⦏"
-	{ "tiles/F25.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFTT,  SCOR_RIGHTT, SCOR_UPT,    SCOR_DOWNT  ,  90 },
-	{ "tiles/F26.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHTT, SCOR_LEFTT,  SCOR_DOWNT,  SCOR_UPT    ,  90 },
+	{ TILES_DIR "/E1.png",  BEU+BSR+BSD+BEL,    ECOR_RIGHTN, SCOR_LEFTN,  ECOR_DOWNN,  SCOR_UPN    ,  50 },
+	{ TILES_DIR "/E2.png",  BEU+BER+BSD+BSL,    ECOR_LEFTN,  SCOR_RIGHTN, SCOR_UPN,    ECOR_DOWNN  ,  50 },
+	{ TILES_DIR "/E3.png",  BSU+BER+BED+BSL,    SCOR_RIGHTN, ECOR_LEFTN,  SCOR_DOWNN,  ECOR_UPN    ,  50 },
+	{ TILES_DIR "/E4.png",  BSU+BSR+BED+BEL,    SCOR_LEFTN,  ECOR_RIGHTN, ECOR_UPN,    SCOR_DOWNN  ,  50 },
+	{ TILES_DIR "/F11.png", BE+BEU+BED+BER+BEL, ECOR_LEFTT,  EMPTY,       ECOR_UPT,    EMPTY       ,   5 }, // "⦍"
+	{ TILES_DIR "/F12.png", BE+BEU+BED+BER+BEL, ECOR_RIGHTT, EMPTY,       EMPTY,       ECOR_UPT    ,   5 }, // "⦐"
+	{ TILES_DIR "/F13.png", BE+BEU+BED+BER+BEL, EMPTY,       ECOR_RIGHTT, EMPTY,       ECOR_DOWNT  ,   5 }, // "⦎"
+	{ TILES_DIR "/F14.png", BE+BEU+BED+BER+BEL, EMPTY,       ECOR_LEFTT,  ECOR_DOWNT,  EMPTY       ,   5 }, // "⦏"
+	{ TILES_DIR "/F15.png", BE+BEU+BED+BER+BEL, ECOR_LEFTT,  ECOR_RIGHTT, ECOR_UPT,    ECOR_DOWNT  ,  10 },
+	{ TILES_DIR "/F16.png", BE+BEU+BED+BER+BEL, ECOR_RIGHTT, ECOR_LEFTT,  ECOR_DOWNT,  ECOR_UPT    ,  10 },
+	{ TILES_DIR "/F21.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFTT,  SOLID,       SCOR_UPT,    SOLID       ,  95 }, // "⦍"
+	{ TILES_DIR "/F22.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHTT, SOLID,       SOLID,       SCOR_UPT    ,  95 }, // "⦐"
+	{ TILES_DIR "/F23.png", BS+BSU+BSD+BSR+BSL, SOLID,       SCOR_RIGHTT, SOLID,       SCOR_DOWNT  ,  95 }, // "⦎"
+	{ TILES_DIR "/F24.png", BS+BSU+BSD+BSR+BSL, SOLID,       SCOR_LEFTT,  SCOR_DOWNT,  SOLID       ,  95 }, // "⦏"
+	{ TILES_DIR "/F25.png", BS+BSU+BSD+BSR+BSL, SCOR_LEFTT,  SCOR_RIGHTT, SCOR_UPT,    SCOR_DOWNT  ,  90 },
+	{ TILES_DIR "/F26.png", BS+BSU+BSD+BSR+BSL, SCOR_RIGHTT, SCOR_LEFTT,  SCOR_DOWNT,  SCOR_UPT    ,  90 },
 
 	// Close Corners
-	{ "tiles/G11.png", BEU+BER+BEL,        EMPTY,       HCOR_LEFTN,  ECOR_DOWNN,  EMPTY       ,  15 },
-	{ "tiles/G12.png", BEU+BER+BEL,        EMPTY,       HCOR_RIGHTN, EMPTY,       ECOR_DOWNN  ,  15 },
-	{ "tiles/G13.png", BER+BED+BEU,        ECOR_LEFTN,  EMPTY,       HCOR_UPN,    EMPTY       ,  15 },
-	{ "tiles/G14.png", BER+BED+BEU,        EMPTY,       ECOR_LEFTN,  HCOR_DOWNN,  EMPTY       ,  15 },
-	{ "tiles/G15.png", BED+BEL+BER,        HCOR_RIGHTN, EMPTY,       EMPTY,       ECOR_UPN    ,  15 },
-	{ "tiles/G16.png", BED+BEL+BER,        HCOR_LEFTN,  EMPTY,       ECOR_UPN,    EMPTY       ,  15 },
-	{ "tiles/G17.png", BEL+BEU+BED,        EMPTY,       HCOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 },
-	{ "tiles/G18.png", BEL+BEU+BED,        HCOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 },
-	{ "tiles/G21.png", BSU+BSR+BSL,        SOLID,       OCOR_LEFTN,  SCOR_DOWNN,  SOLID       ,  85 },
-	{ "tiles/G22.png", BSU+BSR+BSL,        SOLID,       OCOR_RIGHTN, SOLID,       SCOR_DOWNN  ,  85 },
-	{ "tiles/G23.png", BSR+BSD+BSU,        SCOR_LEFTN,  SOLID,       OCOR_UPN,    SOLID       ,  85 },
-	{ "tiles/G24.png", BSR+BSD+BSU,        SOLID,       SCOR_LEFTN,  OCOR_DOWNN,  SOLID       ,  85 },
-	{ "tiles/G25.png", BSD+BSL+BSR,        OCOR_RIGHTN, SOLID,       SOLID,       SCOR_UPN    ,  85 },
-	{ "tiles/G26.png", BSD+BSL+BSR,        OCOR_LEFTN,  SOLID,       SCOR_UPN,    SOLID       ,  85 },
-	{ "tiles/G27.png", BSL+BSU+BSD,        SOLID,       SCOR_RIGHTN, SOLID,       OCOR_DOWNN  ,  85 },
-	{ "tiles/G28.png", BSL+BSU+BSD,        SCOR_RIGHTN, SOLID,       SOLID,       OCOR_UPN    ,  85 },
-	{ "tiles/H11.png", BER,                HCOR_LEFTT,  HALF_LEFT,   SCOR_UPT,    EMPTY       ,  45 },
-	{ "tiles/H12.png", BEL,                HCOR_RIGHTT, HALF_RIGHT,  EMPTY,       SCOR_UPT    ,  45 },
-	{ "tiles/H13.png", BED,                SCOR_RIGHTT, EMPTY,       HALF_UP,     HCOR_UPT    ,  45 },
-	{ "tiles/H14.png", BEU,                EMPTY,       SCOR_RIGHTT, HALF_DOWN,   HCOR_DOWNT  ,  45 },
-	{ "tiles/H15.png", BEL,                HALF_RIGHT,  HCOR_RIGHTT, EMPTY,       SCOR_DOWNT  ,  45 },
-	{ "tiles/H16.png", BER,                HALF_LEFT,   HCOR_LEFTT,  SCOR_DOWNT,  EMPTY       ,  45 },
-	{ "tiles/H17.png", BEU,                EMPTY,       SCOR_LEFTT,  HCOR_DOWNT,  HALF_DOWN   ,  45 },
-	{ "tiles/H18.png", BED,                SCOR_LEFTT,  EMPTY,       HCOR_UPT,    HALF_UP     ,  45 },
-	{ "tiles/H21.png", BSR,                OCOR_LEFTT,  HALF_RIGHT,  ECOR_UPT,    SOLID       ,  55 },
-	{ "tiles/H22.png", BSL,                OCOR_RIGHTT, HALF_LEFT,   SOLID,       ECOR_UPT    ,  55 },
-	{ "tiles/H23.png", BSD,                ECOR_RIGHTT, SOLID,       HALF_DOWN,   OCOR_UPT    ,  55 },
-	{ "tiles/H24.png", BSU,                SOLID,       ECOR_RIGHTT, HALF_UP,     OCOR_DOWNT  ,  55 },
-	{ "tiles/H25.png", BSL,                HALF_LEFT,   OCOR_RIGHTT, SOLID,       ECOR_DOWNT  ,  55 },
-	{ "tiles/H26.png", BSR,                HALF_RIGHT,  OCOR_LEFTT,  ECOR_DOWNT,  SOLID       ,  55 },
-	{ "tiles/H27.png", BSU,                SOLID,       ECOR_LEFTT,  OCOR_DOWNT,  HALF_UP     ,  55 },
-	{ "tiles/H28.png", BSD,                ECOR_LEFTT,  SOLID,       OCOR_UPT,    HALF_DOWN   ,  55 },
+	{ TILES_DIR "/G11.png", BEU+BER+BEL,        EMPTY,       HCOR_LEFTN,  ECOR_DOWNN,  EMPTY       ,  15 },
+	{ TILES_DIR "/G12.png", BEU+BER+BEL,        EMPTY,       HCOR_RIGHTN, EMPTY,       ECOR_DOWNN  ,  15 },
+	{ TILES_DIR "/G13.png", BER+BED+BEU,        ECOR_LEFTN,  EMPTY,       HCOR_UPN,    EMPTY       ,  15 },
+	{ TILES_DIR "/G14.png", BER+BED+BEU,        EMPTY,       ECOR_LEFTN,  HCOR_DOWNN,  EMPTY       ,  15 },
+	{ TILES_DIR "/G15.png", BED+BEL+BER,        HCOR_RIGHTN, EMPTY,       EMPTY,       ECOR_UPN    ,  15 },
+	{ TILES_DIR "/G16.png", BED+BEL+BER,        HCOR_LEFTN,  EMPTY,       ECOR_UPN,    EMPTY       ,  15 },
+	{ TILES_DIR "/G17.png", BEL+BEU+BED,        EMPTY,       HCOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 },
+	{ TILES_DIR "/G18.png", BEL+BEU+BED,        HCOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 },
+	{ TILES_DIR "/G21.png", BSU+BSR+BSL,        SOLID,       OCOR_LEFTN,  SCOR_DOWNN,  SOLID       ,  85 },
+	{ TILES_DIR "/G22.png", BSU+BSR+BSL,        SOLID,       OCOR_RIGHTN, SOLID,       SCOR_DOWNN  ,  85 },
+	{ TILES_DIR "/G23.png", BSR+BSD+BSU,        SCOR_LEFTN,  SOLID,       OCOR_UPN,    SOLID       ,  85 },
+	{ TILES_DIR "/G24.png", BSR+BSD+BSU,        SOLID,       SCOR_LEFTN,  OCOR_DOWNN,  SOLID       ,  85 },
+	{ TILES_DIR "/G25.png", BSD+BSL+BSR,        OCOR_RIGHTN, SOLID,       SOLID,       SCOR_UPN    ,  85 },
+	{ TILES_DIR "/G26.png", BSD+BSL+BSR,        OCOR_LEFTN,  SOLID,       SCOR_UPN,    SOLID       ,  85 },
+	{ TILES_DIR "/G27.png", BSL+BSU+BSD,        SOLID,       SCOR_RIGHTN, SOLID,       OCOR_DOWNN  ,  85 },
+	{ TILES_DIR "/G28.png", BSL+BSU+BSD,        SCOR_RIGHTN, SOLID,       SOLID,       OCOR_UPN    ,  85 },
+	{ TILES_DIR "/H11.png", BER,                HCOR_LEFTT,  HALF_LEFT,   SCOR_UPT,    EMPTY       ,  45 },
+	{ TILES_DIR "/H12.png", BEL,                HCOR_RIGHTT, HALF_RIGHT,  EMPTY,       SCOR_UPT    ,  45 },
+	{ TILES_DIR "/H13.png", BED,                SCOR_RIGHTT, EMPTY,       HALF_UP,     HCOR_UPT    ,  45 },
+	{ TILES_DIR "/H14.png", BEU,                EMPTY,       SCOR_RIGHTT, HALF_DOWN,   HCOR_DOWNT  ,  45 },
+	{ TILES_DIR "/H15.png", BEL,                HALF_RIGHT,  HCOR_RIGHTT, EMPTY,       SCOR_DOWNT  ,  45 },
+	{ TILES_DIR "/H16.png", BER,                HALF_LEFT,   HCOR_LEFTT,  SCOR_DOWNT,  EMPTY       ,  45 },
+	{ TILES_DIR "/H17.png", BEU,                EMPTY,       SCOR_LEFTT,  HCOR_DOWNT,  HALF_DOWN   ,  45 },
+	{ TILES_DIR "/H18.png", BED,                SCOR_LEFTT,  EMPTY,       HCOR_UPT,    HALF_UP     ,  45 },
+	{ TILES_DIR "/H21.png", BSR,                OCOR_LEFTT,  HALF_RIGHT,  ECOR_UPT,    SOLID       ,  55 },
+	{ TILES_DIR "/H22.png", BSL,                OCOR_RIGHTT, HALF_LEFT,   SOLID,       ECOR_UPT    ,  55 },
+	{ TILES_DIR "/H23.png", BSD,                ECOR_RIGHTT, SOLID,       HALF_DOWN,   OCOR_UPT    ,  55 },
+	{ TILES_DIR "/H24.png", BSU,                SOLID,       ECOR_RIGHTT, HALF_UP,     OCOR_DOWNT  ,  55 },
+	{ TILES_DIR "/H25.png", BSL,                HALF_LEFT,   OCOR_RIGHTT, SOLID,       ECOR_DOWNT  ,  55 },
+	{ TILES_DIR "/H26.png", BSR,                HALF_RIGHT,  OCOR_LEFTT,  ECOR_DOWNT,  SOLID       ,  55 },
+	{ TILES_DIR "/H27.png", BSU,                SOLID,       ECOR_LEFTT,  OCOR_DOWNT,  HALF_UP     ,  55 },
+	{ TILES_DIR "/H28.png", BSD,                ECOR_LEFTT,  SOLID,       OCOR_UPT,    HALF_DOWN   ,  55 },
 
 	// Oblique Corners
-	{ "tiles/I11.png", BEU+BER+BSD+BEL,    EMPTY,       SBICORNERN,  ECOR_DOWNN,  ECOR_DOWNN  ,  20 },
-	{ "tiles/I12.png", BEU+BER+BED+BSL,    ECOR_LEFTN,  ECOR_LEFTN,  SBICORNERN,  EMPTY       ,  20 },
-	{ "tiles/I13.png", BSU+BER+BED+BEL,    SBICORNERN,  EMPTY,       ECOR_UPN,    ECOR_UPN    ,  20 },
-	{ "tiles/I14.png", BEU+BSR+BED+BEL,    ECOR_RIGHTN, ECOR_RIGHTN, EMPTY,       SBICORNERN  ,  20 },
-	{ "tiles/I21.png", BSU+BSR+BED+BSL,    SOLID,       EBICORNERN,  SCOR_DOWNN,  SCOR_DOWNN  ,  80 },
-	{ "tiles/I22.png", BSU+BSR+BSD+BEL,    SCOR_LEFTN,  SCOR_LEFTN,  EBICORNERN,  SOLID       ,  80 },
-	{ "tiles/I23.png", BEU+BSR+BSD+BSL,    EBICORNERN,  SOLID,       SCOR_UPN,    SCOR_UPN    ,  80 },
-	{ "tiles/I24.png", BSU+BER+BSD+BSL,    ECOR_RIGHTN, ECOR_RIGHTN, SOLID,       EBICORNERN  ,  80 },
-	{ "tiles/J11.png", BE,                 SBICORNERT,  SOLID,       SCOR_UPT,    SCOR_UPT    ,  90 },
-	{ "tiles/J12.png", BE,                 SCOR_RIGHTT, SCOR_RIGHTT, SOLID,       SBICORNERT  ,  90 },
-	{ "tiles/J13.png", BE,                 SOLID,       SBICORNERT,  SCOR_DOWNT,  SCOR_DOWNT  ,  90 },
-	{ "tiles/J14.png", BE,                 SCOR_LEFTT,  SCOR_LEFTT,  SBICORNERT,  SOLID       ,  90 },
-	{ "tiles/J21.png", BS,                 EBICORNERT,  EMPTY,       ECOR_UPT,    ECOR_UPT    ,  10 },
-	{ "tiles/J22.png", BS,                 ECOR_RIGHTT, ECOR_RIGHTT, EMPTY,       EBICORNERT  ,  10 },
-	{ "tiles/J23.png", BS,                 EMPTY,       EBICORNERT,  ECOR_DOWNT,  ECOR_DOWNT  ,  10 },
-	{ "tiles/J24.png", BS,                 ECOR_LEFTT,  ECOR_LEFTT,  EBICORNERT,  EMPTY       ,  10 },
+	{ TILES_DIR "/I11.png", BEU+BER+BSD+BEL,    EMPTY,       SBICORNERN,  ECOR_DOWNN,  ECOR_DOWNN  ,  20 },
+	{ TILES_DIR "/I12.png", BEU+BER+BED+BSL,    ECOR_LEFTN,  ECOR_LEFTN,  SBICORNERN,  EMPTY       ,  20 },
+	{ TILES_DIR "/I13.png", BSU+BER+BED+BEL,    SBICORNERN,  EMPTY,       ECOR_UPN,    ECOR_UPN    ,  20 },
+	{ TILES_DIR "/I14.png", BEU+BSR+BED+BEL,    ECOR_RIGHTN, ECOR_RIGHTN, EMPTY,       SBICORNERN  ,  20 },
+	{ TILES_DIR "/I21.png", BSU+BSR+BED+BSL,    SOLID,       EBICORNERN,  SCOR_DOWNN,  SCOR_DOWNN  ,  80 },
+	{ TILES_DIR "/I22.png", BSU+BSR+BSD+BEL,    SCOR_LEFTN,  SCOR_LEFTN,  EBICORNERN,  SOLID       ,  80 },
+	{ TILES_DIR "/I23.png", BEU+BSR+BSD+BSL,    EBICORNERN,  SOLID,       SCOR_UPN,    SCOR_UPN    ,  80 },
+	{ TILES_DIR "/I24.png", BSU+BER+BSD+BSL,    ECOR_RIGHTN, ECOR_RIGHTN, SOLID,       EBICORNERN  ,  80 },
+	{ TILES_DIR "/J11.png", BE,                 SBICORNERT,  SOLID,       SCOR_UPT,    SCOR_UPT    ,  90 },
+	{ TILES_DIR "/J12.png", BE,                 SCOR_RIGHTT, SCOR_RIGHTT, SOLID,       SBICORNERT  ,  90 },
+	{ TILES_DIR "/J13.png", BE,                 SOLID,       SBICORNERT,  SCOR_DOWNT,  SCOR_DOWNT  ,  90 },
+	{ TILES_DIR "/J14.png", BE,                 SCOR_LEFTT,  SCOR_LEFTT,  SBICORNERT,  SOLID       ,  90 },
+	{ TILES_DIR "/J21.png", BS,                 EBICORNERT,  EMPTY,       ECOR_UPT,    ECOR_UPT    ,  10 },
+	{ TILES_DIR "/J22.png", BS,                 ECOR_RIGHTT, ECOR_RIGHTT, EMPTY,       EBICORNERT  ,  10 },
+	{ TILES_DIR "/J23.png", BS,                 EMPTY,       EBICORNERT,  ECOR_DOWNT,  ECOR_DOWNT  ,  10 },
+	{ TILES_DIR "/J24.png", BS,                 ECOR_LEFTT,  ECOR_LEFTT,  EBICORNERT,  EMPTY       ,  10 },
 
 	// Singularities
-	{ "tiles/K1.png",  BE,                 EBICORNERT,  EBICORNERT,  EBICORNERT,  EBICORNERT  ,  80 },
-	{ "tiles/K2.png",  BS,                 SBICORNERT,  SBICORNERT,  SBICORNERT,  SBICORNERT  ,  20 },
-	{ "tiles/L11.png", BSD,                EBICORNERT,  SOLID,       OCOR_UPT,    OCOR_UPT    ,  60 },
-	{ "tiles/L12.png", BSL,                OCOR_RIGHTT, OCOR_RIGHTT, SOLID,       EBICORNERT  ,  60 },
-	{ "tiles/L13.png", BSU,                SOLID,       EBICORNERT,  OCOR_DOWNT,  OCOR_DOWNT  ,  60 },
-	{ "tiles/L14.png", BSR,                OCOR_LEFTT,  OCOR_LEFTT,  EBICORNERT,  SOLID       ,  60 },
-	{ "tiles/L21.png", BED,                SBICORNERT,  EMPTY,       HCOR_UPT,    HCOR_UPT    ,  40 },
-	{ "tiles/L22.png", BEL,                HCOR_RIGHTT, HCOR_RIGHTT, EMPTY,       SBICORNERT  ,  40 },
-	{ "tiles/L23.png", BEU,                EMPTY,       SBICORNERT,  HCOR_DOWNT,  HCOR_DOWNT  ,  40 },
-	{ "tiles/L24.png", BER,                HCOR_LEFTT,  HCOR_LEFTT,  SBICORNERT,  EMPTY       ,  40 },
+	{ TILES_DIR "/K1.png",  BE,                 EBICORNERT,  EBICORNERT,  EBICORNERT,  EBICORNERT  ,  80 },
+	{ TILES_DIR "/K2.png",  BS,                 SBICORNERT,  SBICORNERT,  SBICORNERT,  SBICORNERT  ,  20 },
+	{ TILES_DIR "/L11.png", BSD,                EBICORNERT,  SOLID,       OCOR_UPT,    OCOR_UPT    ,  60 },
+	{ TILES_DIR "/L12.png", BSL,                OCOR_RIGHTT, OCOR_RIGHTT, SOLID,       EBICORNERT  ,  60 },
+	{ TILES_DIR "/L13.png", BSU,                SOLID,       EBICORNERT,  OCOR_DOWNT,  OCOR_DOWNT  ,  60 },
+	{ TILES_DIR "/L14.png", BSR,                OCOR_LEFTT,  OCOR_LEFTT,  EBICORNERT,  SOLID       ,  60 },
+	{ TILES_DIR "/L21.png", BED,                SBICORNERT,  EMPTY,       HCOR_UPT,    HCOR_UPT    ,  40 },
+	{ TILES_DIR "/L22.png", BEL,                HCOR_RIGHTT, HCOR_RIGHTT, EMPTY,       SBICORNERT  ,  40 },
+	{ TILES_DIR "/L23.png", BEU,                EMPTY,       SBICORNERT,  HCOR_DOWNT,  HCOR_DOWNT  ,  40 },
+	{ TILES_DIR "/L24.png", BER,                HCOR_LEFTT,  HCOR_LEFTT,  SBICORNERT,  EMPTY       ,  40 },
 };
 
 unsigned int TileSet::TileDataNumAllTiles = sizeof(TileSet::TileData) / sizeof(TileSet::TileConfig);
