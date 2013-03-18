@@ -30,6 +30,10 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <climits>
+
+#define VERY_HIGH INT_MAX
+#define VERY_LOW INT_MIN
 
 class TileSet {
 public:
@@ -140,11 +144,9 @@ public:
 	inline int Fill(unsigned int index) const {
 		return TileConfigData[index].Fill;
 	}
-
 	inline sf::Image & GetImage(unsigned int index) {
 		return TileRuntimeData[index].Image;
 	}
-
 	inline sf::Sprite & GetSprite(unsigned int index) {
 		return TileRuntimeData[index].Sprite;
 	}
@@ -371,14 +373,13 @@ struct MapCell {
 };
 
 struct MapLayer {
-	const char * BaseDir;
-	const TileSet * Tiles;
+	TileSet * Tiles;
 	signed int Elevation;
 };
 
 struct Map {
 	Map(unsigned int w, unsigned int h, signed int min_elev, signed int max_elev) :
-	Width(w), Height(h), CurrentLayer(NULL), MaxElevation(max_elev), MinElevation(min_elev) {
+	Width(w), Height(h), Layers(NULL), MaxElevation(max_elev), MinElevation(min_elev) {
 		Cells = new MapCell[h*w];
 		memset(Cells, 0, h*w*sizeof(MapCell));
 	}
@@ -599,20 +600,32 @@ struct Map {
 
 	bool AddTilesInLayer()
 	{
-		for (unsigned int tries = 0 ; tries < 1; ++tries) {
+		CurrentLayer = StartingLayer;
+		for (unsigned int tries = 0 ; tries < 2; ++tries) {
 			SetupInitialTiles();
 			if (AdjustTiles()) return true;
 		}
 		return false;
 	}
 
-	inline void SetCurrentLayer(MapLayer & layer) {
-		CurrentLayer = &layer;
+	inline void SetLayers(MapLayer layers[]) {
+		Layers = layers;
+		StartingLayer = &Layers[0];
+	}
+
+	inline void SetStartingLayer(int index) {
+		StartingLayer = &Layers[index];
+	}
+
+	inline MapLayer * GetCurrentLayer() {
+		return CurrentLayer;
 	}
 
 	unsigned int Width;
 	unsigned int Height;
-	const MapLayer * CurrentLayer;
+	MapLayer * Layers;
+	MapLayer * StartingLayer;
+	MapLayer * CurrentLayer;
 	MapCell *Cells;
 	signed int MaxElevation;
 	signed int MinElevation;
@@ -622,15 +635,24 @@ int main()
 {
 	srand((unsigned)time(0));
 
-	TileSet tiles;
-	if (!tiles.LoadTileImages("tiles"))
+	TileSet tiles1;
+	if (!tiles1.LoadTileImages("tiles/1"))
+		return EXIT_FAILURE;
+
+	TileSet tiles2;
+	if (!tiles2.LoadTileImages("tiles/2"))
+		return EXIT_FAILURE;
+
+	TileSet tiles3;
+	if (!tiles3.LoadTileImages("tiles/3"))
 		return EXIT_FAILURE;
 
 	Map map(32, 24, -100, 100);
 	map.Random();
 
-	MapLayer layer = { "tiles", &tiles , 0 };
-	map.SetCurrentLayer(layer);
+	MapLayer layers[] = { { &tiles1 , -5 }, { &tiles2 , 0 }, { &tiles3 , 5 }, { NULL , 0 } };
+	map.SetLayers(layers);
+	map.SetStartingLayer(1);
 	map.AddTilesInLayer();
 
 	// Create the main rendering window
@@ -649,6 +671,7 @@ int main()
 		// Clear screen
 		App.Clear();
 
+		TileSet & tiles = *map.GetCurrentLayer()->Tiles;
 		for (unsigned int y=0; y<map.getHeight(); ++y) {
 			for (unsigned int x=0; x<map.getWidth(); ++x) {
 				int tile_id = map.Cells[x+y*map.getWidth()].TileID;
