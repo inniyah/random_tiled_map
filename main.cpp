@@ -108,7 +108,7 @@ struct Map {
 		};
 	};
 
-	bool AdjustTiles(unsigned int iterations = 200) {
+	bool AdjustTiles(unsigned int iterations = 250) {
 		const TileSet * Tiles = CurrentLayer->Tiles;
 		bool tiles_ok[Width * Height];
 		for (unsigned int k=0; k<iterations; ++k) {
@@ -184,6 +184,13 @@ struct Map {
 						if (best_err) {
 							tiles_ok[x+y*Width] = false;
 							++wrong;
+							if (rand() % 100 <= 5) {
+								if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
+									Cells[x+y*Width].TileID = Tiles->SolidTile();
+								} else {
+									Cells[x+y*Width].TileID = Tiles->EmptyTile();
+								}
+							}
 						} else {
 							tiles_ok[x+y*Width] = true;
 						}
@@ -282,7 +289,6 @@ struct Map {
 
 	void AddTiles()
 	{
-
 		// Central layer
 		CurrentLayer = StartingLayer;
 		TileSet * tiles = CurrentLayer->Tiles;
@@ -440,6 +446,12 @@ int main()
 	// Create the main rendering window
 	sf::RenderWindow app(sf::VideoMode(1024, 768, 32), "SFML TileMap");
 
+	// Get a reference to the input manager associated to our window
+	//const sf::Input& input = app.GetInput();
+
+	signed int OffsetX = 0;
+	signed int OffsetY = 0;
+
 	// Start game loop
 	while (app.IsOpened()) {
 		sf::Event event;
@@ -451,70 +463,81 @@ int main()
 			}
 
 			if (event.Type == sf::Event::Resized) {
-				std::cout << "new width: " << event.Size.Width << std::endl;
-				std::cout << "new height: " << event.Size.Height << std::endl;
+				//std::cout << "new width: " << event.Size.Width << std::endl;
+				//std::cout << "new height: " << event.Size.Height << std::endl;
 			}
 
 			if (event.Type == sf::Event::LostFocus) {
-				std::cout << "lost focus" << std::endl;
+				//std::cout << "lost focus" << std::endl;
 			}
 
 			if (event.Type == sf::Event::GainedFocus) {
-				std::cout << "gained focus" << std::endl;
+				//std::cout << "gained focus" << std::endl;
 			}
 
 			if (event.Type == sf::Event::TextEntered) {
-				if (event.Text.Unicode < 128)
-					std::cout << "ASCII character typed: " << static_cast<char>(event.Text.Unicode) << std::endl;
+				if (event.Text.Unicode < 128) {
+					//std::cout << "ASCII character typed: " << static_cast<char>(event.Text.Unicode) << std::endl;
+				}
 			}
 
 			if (event.Type == sf::Event::KeyPressed) {
 				if (event.Key.Code == sf::Key::Escape) {
-					std::cout << "the escape key was pressed" << std::endl;
-					std::cout << "control:" << event.Key.Control << std::endl;
-					std::cout << "alt:" << event.Key.Alt << std::endl;
-					std::cout << "shift:" << event.Key.Shift << std::endl;
-					//std::cout << "system:" << event.Key.System << std::endl;
+					//std::cout << "the escape key was pressed" << std::endl;
+					//std::cout << "control:" << event.Key.Control << std::endl;
+					//std::cout << "alt:" << event.Key.Alt << std::endl;
+					//std::cout << "shift:" << event.Key.Shift << std::endl;
+					////std::cout << "system:" << event.Key.System << std::endl;
 				}
 			}
 
 			if (event.Type == sf::Event::MouseWheelMoved) {
-				std::cout << "wheel movement: " << event.MouseWheel.Delta << std::endl;
-				//std::cout << "mouse x: " << event.MouseWheel.X << std::endl;
-				//std::cout << "mouse y: " << event.MouseWheel.Y << std::endl;
+				//std::cout << "wheel movement: " << event.MouseWheel.Delta << std::endl;
+				////std::cout << "mouse x: " << event.MouseWheel.X << std::endl;
+				////std::cout << "mouse y: " << event.MouseWheel.Y << std::endl;
 			}
 
 			if (event.Type == sf::Event::MouseButtonPressed) {
 				if (event.MouseButton.Button == sf::Mouse::Right) {
-					std::cout << "the right button was pressed" << std::endl;
-					std::cout << "mouse x: " << event.MouseButton.X << std::endl;
-					std::cout << "mouse y: " << event.MouseButton.Y << std::endl;
+					//std::cout << "the right button was pressed" << std::endl;
+					//std::cout << "mouse x: " << event.MouseButton.X << std::endl;
+					//std::cout << "mouse y: " << event.MouseButton.Y << std::endl;
 				}
 			}
 
 			if (event.Type == sf::Event::MouseMoved) {
-				std::cout << "new mouse x: " << event.MouseMove.X << std::endl;
-				std::cout << "new mouse y: " << event.MouseMove.Y << std::endl;
+				//std::cout << "new mouse x: " << event.MouseMove.X << std::endl;
+				//std::cout << "new mouse y: " << event.MouseMove.Y << std::endl;
 			}
 
 			if (event.Type == sf::Event::MouseEntered) {
-				std::cout << "the mouse cursor has entered the window" << std::endl;
+				//std::cout << "the mouse cursor has entered the window" << std::endl;
 			}
 
 			if (event.Type == sf::Event::MouseLeft) {
-				std::cout << "the mouse cursor has left the window" << std::endl;
+				//std::cout << "the mouse cursor has left the window" << std::endl;
 			}
 
 			if (event.Type == sf::Event::JoyMoved) {
 				if (event.JoyMove.Axis == sf::Joy::AxisX) {
-					std::cout << "X axis moved!" << std::endl;
-					std::cout << "joystick id: " << event.JoyMove.JoystickId << std::endl;
-					std::cout << "new position: " << event.JoyMove.Position << std::endl;
+					//std::cout << "X axis moved!" << std::endl;
+					//std::cout << "joystick id: " << event.JoyMove.JoystickId << std::endl;
+					//std::cout << "new position: " << event.JoyMove.Position << std::endl;
 				}
 			}
 
 		}
+/*
+		bool LeftKeyDown  = input.IsKeyDown(sf::Key::Left);
+		bool RightKeyDown = input.IsKeyDown(sf::Key::Right);
+		bool UpKeyDown    = input.IsKeyDown(sf::Key::Up);
+		bool DownKeyDown  = input.IsKeyDown(sf::Key::Down);
 
+		if (LeftKeyDown) OffsetX -= 8;
+		if (RightKeyDown) OffsetX += 8;
+		if (UpKeyDown) OffsetY -= 8;
+		if (DownKeyDown) OffsetY += 8;
+*/
 		// Clear screen
 		app.Clear();
 
@@ -527,7 +550,7 @@ int main()
 				int width = image.GetWidth();
 				int height = image.GetHeight();
 				// Adjust the offset by using the width
-				sprite.SetPosition(x * width, y * height);
+				sprite.SetPosition(OffsetX + x * width, OffsetY + y * height);
 				// Draw the tile
 				app.Draw(sprite);
 			}
@@ -536,7 +559,7 @@ int main()
 		// Display window contents on screen
 		app.Display();
 
-		sf::Sleep(1.0f / 60.0f);
+//		sf::Sleep(1.0f / 60.0f);
 	}
 
 	return EXIT_SUCCESS;
