@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Window.hpp>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -40,6 +41,7 @@
 
 struct MapCell {
 	signed int Elevation;
+	signed int LayerElevRef;
 	unsigned char TileID;
 	TileSet::TileRuntime * TileRuntimeData;
 	struct {
@@ -221,6 +223,7 @@ struct Map {
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
 				if (!Cells[x + y*Width].FixedTile && !Cells[x + y*Width].Ignore) {
+					Cells[x + y*Width].LayerElevRef = CurrentLayer->Elevation;
 	
 					unsigned int xm = x > 0        ? x - 1 : x;
 					unsigned int xp = x < Width-1  ? x + 1 : x;
@@ -436,7 +439,7 @@ int main()
 
 	MapLayer layers[] = { { NULL , VERY_LOW }, { &tiles1 , -4 }, { &tiles2 , 0 }, { &tiles3 , 8 }, { NULL , VERY_HIGH } };
 
-	Map map(32, 24, -100, 100);
+	Map map(32*2, 24*2, -100, 100);
 	map.SetLayers(layers);
 
 	map.Random();
@@ -447,7 +450,7 @@ int main()
 	sf::RenderWindow app(sf::VideoMode(1024, 768, 32), "SFML TileMap");
 
 	// Get a reference to the input manager associated to our window
-	//const sf::Input& input = app.GetInput();
+	const sf::Input& input = app.GetInput();
 
 	signed int OffsetX = 0;
 	signed int OffsetY = 0;
@@ -527,22 +530,38 @@ int main()
 			}
 
 		}
-/*
+
 		bool LeftKeyDown  = input.IsKeyDown(sf::Key::Left);
 		bool RightKeyDown = input.IsKeyDown(sf::Key::Right);
 		bool UpKeyDown    = input.IsKeyDown(sf::Key::Up);
 		bool DownKeyDown  = input.IsKeyDown(sf::Key::Down);
 
-		if (LeftKeyDown) OffsetX -= 8;
-		if (RightKeyDown) OffsetX += 8;
-		if (UpKeyDown) OffsetY -= 8;
-		if (DownKeyDown) OffsetY += 8;
-*/
+		if (LeftKeyDown) OffsetX -= 16;
+		if (RightKeyDown) OffsetX += 16;
+		if (UpKeyDown) OffsetY -= 16;
+		if (DownKeyDown) OffsetY += 16;
+
 		// Clear screen
 		app.Clear();
 
-		for (unsigned int y=0; y<map.getHeight(); ++y) {
-			for (unsigned int x=0; x<map.getWidth(); ++x) {
+		// Get screen dimensions
+		unsigned int screen_height = app.GetHeight();
+		unsigned int screen_width = app.GetWidth();
+
+		// Draw only the part of map shown in screen
+		unsigned int start_y = (OffsetY > 0 ? OffsetY : 0) / 32 + 1;
+		unsigned int end_y = (OffsetY + screen_height) / 32 - 1;
+		unsigned int start_x = (OffsetX > 0 ? OffsetX : 0) / 32 + 1;
+		unsigned int end_x = (OffsetX + screen_width) / 32 - 1;
+
+		// Careful with the limits of the map
+		start_y = start_y > 0 ? start_y : 0;
+		end_y = end_y < map.getHeight() ? end_y : map.getHeight();
+		start_x = start_x > 0 ? start_x : 0;
+		end_x = end_x < map.getWidth() ? end_x : map.getWidth();
+
+		for (unsigned int y=start_y; y<end_y; ++y) {
+			for (unsigned int x=start_x; x<end_x; ++x) {
 				// Get the tile's image and sprite
 				sf::Sprite & sprite = map.Cells[x+y*map.getWidth()].TileRuntimeData->Sprite;
 				const sf::Image & image = *sprite.GetImage();
@@ -550,7 +569,7 @@ int main()
 				int width = image.GetWidth();
 				int height = image.GetHeight();
 				// Adjust the offset by using the width
-				sprite.SetPosition(OffsetX + x * width, OffsetY + y * height);
+				sprite.SetPosition(x * width - OffsetX, y * height - OffsetY);
 				// Draw the tile
 				app.Draw(sprite);
 			}
