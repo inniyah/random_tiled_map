@@ -144,6 +144,9 @@ public:
 	inline int Fill(unsigned int index) const {
 		return TileConfigData[index].Fill;
 	}
+	inline TileRuntime & GetTileRuntimeData(unsigned int index) {
+		return TileRuntimeData[index];
+	}
 	inline sf::Image & GetImage(unsigned int index) {
 		return TileRuntimeData[index].Image;
 	}
@@ -365,8 +368,10 @@ unsigned int TileSet::TileDataNumAllTiles = sizeof(TileSet::TileConfigData) / si
 struct MapCell {
 	signed int Elevation;
 	unsigned char TileID;
+	TileSet::TileRuntime * TileRuntimeData;
 	struct {
 		bool FixedTile : 1;
+		bool Ignore : 1;
 		bool GrowUp : 1;
 		bool GrowDown : 1;
 	};
@@ -443,7 +448,7 @@ struct Map {
 				for (unsigned int xi=0; xi<Width; ++xi) {
 					unsigned int x = (x0+xi) % Width;
 					int best_err = -1;
-					if (!Cells[x + y*Width].FixedTile) {
+					if (!Cells[x + y*Width].FixedTile && !Cells[x + y*Width].Ignore) {
 						unsigned char best_tile = 0;
 						best_err = -1;
 						int c0 = rand() % (Tiles->NumTiles());
@@ -509,14 +514,14 @@ struct Map {
 						} else {
 							tiles_ok[x+y*Width] = true;
 						}
-					} // if (!Cells[x + y*Width].FixedTile)
+					} // if (!Cells[x + y*Width].FixedTile && !Cells[x + y*Width].Ignore)
 				} // for (unsigned int xi=0; xi<Width; ++xi)
 			} // for (unsigned int yi=0; yi<Height; ++yi)
 			printf("Iter=%d, Changes= %d, Wrong=%d\n", k, changes, wrong);
 			if (wrong && !changes) {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
-						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].FixedTile) {
+						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].FixedTile && !Cells[x+y*Width].Ignore) {
 							if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
 								Cells[x+y*Width].TileID = Tiles->SolidTile();
 							} else {
@@ -535,7 +540,7 @@ struct Map {
 		const TileSet * Tiles = CurrentLayer->Tiles;
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
-				if (!Cells[x + y*Width].FixedTile) {
+				if (!Cells[x + y*Width].FixedTile && !Cells[x + y*Width].Ignore) {
 	
 					unsigned int xm = x > 0        ? x - 1 : x;
 					unsigned int xp = x < Width-1  ? x + 1 : x;
@@ -556,7 +561,9 @@ struct Map {
 					if (u && d && l && r) c = true;
 
 					Cells[x+y*Width].TileID = Tiles->SolidTile();
-					Cells[x+y*Width].FixedTile = false;
+					//Cells[x+y*Width].FixedTile = false;
+					//Cells[x+y*Width].Ignore = false;
+
 					if (c & u & d & l & r) {
 						Cells[x+y*Width].TileID = Tiles->SolidTile();
 						//if (ul & ur & dl & dr) {
@@ -574,12 +581,14 @@ struct Map {
 							(dl?0x004:0)+( d?0x002:0)+(dr?0x001:0);
 						Cells[x+y*Width].TileID = Tiles->InitialTileGuess(env);
 					}
-				} // if (!Cells[x + y*Width].FixedTile)
+				} // if (!Cells[x + y*Width].FixedTile && !Cells[x + y*Width].Ignore)
 			} // for (unsigned int x=0; x<Width; ++x)
 		} // for (unsigned int y=0; y<Height; ++y)
 	}
 
 	void Random() {
+		memset(Cells, 0, Height*Width*sizeof(MapCell));
+
 		for (unsigned int y=0; y<Height; ++y) {
 			for (unsigned int x=0; x<Width; ++x) {
 				Cells[x+y*Width].Elevation = MinElevation + (rand() % (MaxElevation - MinElevation));
@@ -598,14 +607,33 @@ struct Map {
 		printf("\n");
 	}
 
-	bool AddTilesInLayer()
+	void AddTiles()
 	{
 		CurrentLayer = StartingLayer;
+		TileSet * Tiles = CurrentLayer->Tiles;
+		unsigned int empty_tile = Tiles->EmptyTile();
+		unsigned int solid_tile = Tiles->SolidTile();
+
+		for(unsigned int y = 0; y < Height; ++y) {
+			for(unsigned int x = 0; x < Width; ++x) {
+				Cells[x+y*Width].FixedTile = false;
+				Cells[x+y*Width].Ignore = false;
+				Cells[x+y*Width].TileRuntimeData = &Tiles->GetTileRuntimeData(empty_tile);
+			}
+		}
+
 		for (unsigned int tries = 0 ; tries < 2; ++tries) {
 			SetupInitialTiles();
-			if (AdjustTiles()) return true;
+			if (AdjustTiles()) break;
 		}
-		return false;
+
+		for(unsigned int y = 0; y < Height; ++y) {
+			for(unsigned int x = 0; x < Width; ++x) {
+				Cells[x+y*Width].TileRuntimeData = &Tiles->GetTileRuntimeData(Cells[x+y*Width].TileID);
+			}
+		}
+
+
 	}
 
 	inline void SetLayers(MapLayer layers[]) {
@@ -647,13 +675,14 @@ int main()
 	if (!tiles3.LoadTileImages("tiles/3"))
 		return EXIT_FAILURE;
 
-	Map map(32, 24, -100, 100);
-	map.Random();
-
 	MapLayer layers[] = { { &tiles1 , -5 }, { &tiles2 , 0 }, { &tiles3 , 5 }, { NULL , 0 } };
+
+	Map map(32, 24, -100, 100);
 	map.SetLayers(layers);
+
+	map.Random();
 	map.SetStartingLayer(1);
-	map.AddTilesInLayer();
+	map.AddTiles();
 
 	// Create the main rendering window
 	sf::RenderWindow App(sf::VideoMode(1024, 768, 32), "SFML TileMap");
@@ -671,19 +700,18 @@ int main()
 		// Clear screen
 		App.Clear();
 
-		TileSet & tiles = *map.GetCurrentLayer()->Tiles;
 		for (unsigned int y=0; y<map.getHeight(); ++y) {
 			for (unsigned int x=0; x<map.getWidth(); ++x) {
-				int tile_id = map.Cells[x+y*map.getWidth()].TileID;
-				// Get the tile's image
-				const sf::Image* image = tiles.GetSprite(tile_id).GetImage();
+				// Get the tile's image and sprite
+				sf::Sprite & sprite = map.Cells[x+y*map.getWidth()].TileRuntimeData->Sprite;
+				const sf::Image & image = *sprite.GetImage();
 				// Get the width and height of the image
-				int width = image->GetWidth();
-				int height = image->GetHeight();
+				int width = image.GetWidth();
+				int height = image.GetHeight();
 				// Adjust the offset by using the width
-				tiles.GetSprite(tile_id).SetPosition(x * width, y * height);
+				sprite.SetPosition(x * width, y * height);
 				// Draw the tile
-				App.Draw(tiles.GetSprite(tile_id));
+				App.Draw(sprite);
 			}
 		}
 
