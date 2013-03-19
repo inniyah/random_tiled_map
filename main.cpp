@@ -609,16 +609,18 @@ struct Map {
 
 	void AddTiles()
 	{
+
+		// Central layer
 		CurrentLayer = StartingLayer;
-		TileSet * Tiles = CurrentLayer->Tiles;
-		unsigned int empty_tile = Tiles->EmptyTile();
-		unsigned int solid_tile = Tiles->SolidTile();
+		TileSet * tiles = CurrentLayer->Tiles;
+		unsigned int empty_tile = tiles->EmptyTile();
+		unsigned int solid_tile = tiles->SolidTile();
 
 		for(unsigned int y = 0; y < Height; ++y) {
 			for(unsigned int x = 0; x < Width; ++x) {
 				Cells[x+y*Width].FixedTile = false;
 				Cells[x+y*Width].Ignore = false;
-				Cells[x+y*Width].TileRuntimeData = &Tiles->GetTileRuntimeData(empty_tile);
+				Cells[x+y*Width].TileRuntimeData = &tiles->GetTileRuntimeData(empty_tile);
 			}
 		}
 
@@ -629,10 +631,88 @@ struct Map {
 
 		for(unsigned int y = 0; y < Height; ++y) {
 			for(unsigned int x = 0; x < Width; ++x) {
-				Cells[x+y*Width].TileRuntimeData = &Tiles->GetTileRuntimeData(Cells[x+y*Width].TileID);
+				unsigned int tile_id = Cells[x+y*Width].TileID;
+				Cells[x+y*Width].TileRuntimeData = &tiles->GetTileRuntimeData(tile_id);
+				if (tile_id == solid_tile) Cells[x+y*Width].GrowUp = true;
+				else if (tile_id == empty_tile) Cells[x+y*Width].GrowDown = true;
 			}
 		}
 
+		// Upper layers
+		CurrentLayer = StartingLayer + 1;
+		tiles = CurrentLayer->Tiles;
+		if (tiles != NULL) {
+			empty_tile = tiles->EmptyTile();
+			solid_tile = tiles->SolidTile();
+
+			for(unsigned int y = 0; y < Height; ++y) {
+				for(unsigned int x = 0; x < Width; ++x) {
+					if (!Cells[x+y*Width].FixedTile) {
+						if (Cells[x+y*Width].GrowUp) {
+							Cells[x+y*Width].TileID = empty_tile;
+							Cells[x+y*Width].Ignore = false;
+						} else {
+							Cells[x+y*Width].Ignore = true;
+						}
+					}
+				}
+			}
+
+			for (unsigned int tries = 0 ; tries < 2; ++tries) {
+				SetupInitialTiles();
+				//if (AdjustTiles()) break;
+			}
+
+			for(unsigned int y = 0; y < Height; ++y) {
+				for(unsigned int x = 0; x < Width; ++x) {
+					if (Cells[x+y*Width].GrowUp) {
+						unsigned int tile_id = Cells[x+y*Width].TileID;
+						Cells[x+y*Width].TileRuntimeData = &tiles->GetTileRuntimeData(tile_id);
+						if (tile_id == solid_tile) Cells[x+y*Width].GrowUp = true;
+						else if (tile_id == empty_tile) Cells[x+y*Width].GrowUp = false;
+					}
+				}
+			}
+
+		}
+
+		// Lower layers
+		CurrentLayer = StartingLayer - 1;
+		tiles = CurrentLayer->Tiles;
+		if (tiles != NULL) {
+			empty_tile = tiles->EmptyTile();
+			solid_tile = tiles->SolidTile();
+
+			for(unsigned int y = 0; y < Height; ++y) {
+				for(unsigned int x = 0; x < Width; ++x) {
+					if (!Cells[x+y*Width].FixedTile) {
+						if (Cells[x+y*Width].GrowDown) {
+							Cells[x+y*Width].TileID = empty_tile;
+							Cells[x+y*Width].Ignore = false;
+						} else {
+							Cells[x+y*Width].Ignore = true;
+						}
+					}
+				}
+			}
+
+			for (unsigned int tries = 0 ; tries < 2; ++tries) {
+				SetupInitialTiles();
+				if (AdjustTiles()) break;
+			}
+
+			for(unsigned int y = 0; y < Height; ++y) {
+				for(unsigned int x = 0; x < Width; ++x) {
+					if (Cells[x+y*Width].GrowDown) {
+						unsigned int tile_id = Cells[x+y*Width].TileID;
+						Cells[x+y*Width].TileRuntimeData = &tiles->GetTileRuntimeData(tile_id);
+						if (tile_id == solid_tile) Cells[x+y*Width].GrowUp = true;
+						else if (tile_id == empty_tile) Cells[x+y*Width].GrowUp = false;
+					}
+				}
+			}
+
+		}
 
 	}
 
@@ -675,7 +755,7 @@ int main()
 	if (!tiles3.LoadTileImages("tiles/3"))
 		return EXIT_FAILURE;
 
-	MapLayer layers[] = { { &tiles1 , -5 }, { &tiles2 , 0 }, { &tiles3 , 5 }, { NULL , 0 } };
+	MapLayer layers[] = { { &tiles1 , -2 }, { &tiles2 , 0 }, { &tiles3 , 2 }, { NULL , VERY_HIGH } };
 
 	Map map(32, 24, -100, 100);
 	map.SetLayers(layers);
