@@ -2,7 +2,8 @@ PROGRAM=test
 
 all: $(PROGRAM)
 
-OBJS = main.o
+OBJS = main.o tileset.o
+HDRS = $(shell find . -name "*.h")
 
 PKG_CONFIG=
 PKG_CONFIG_CFLAGS=`pkg-config --cflags $(PKG_CONFIG) 2>/dev/null`
@@ -16,11 +17,11 @@ LIBS=$(PKG_CONFIG_LIBS) -lsfml-graphics -lsfml-window -lsfml-system
 $(PROGRAM): $(OBJS)
 	g++ $(LDFLAGS) $+ -o $@ $(LIBS)
 
-%.o: %.cpp
-	g++ -o $@ -c $+ $(CFLAGS) $(PKG_CONFIG_CFLAGS)
+%.o: %.cpp $(HDRS) Makefile
+	g++ -o $@ -c $< $(CFLAGS) $(PKG_CONFIG_CFLAGS)
 
-%.o: %.c
-	gcc -o $@ -c $+ $(CFLAGS) $(PKG_CONFIG_CFLAGS)
+%.o: %.c $(HDRS) Makefile
+	gcc -o $@ -c $< $(CFLAGS) $(PKG_CONFIG_CFLAGS)
 
 clean:
 	rm -fv $(OBJS)
