@@ -638,7 +638,7 @@ struct Map {
 			}
 		}
 
-		// Upper layers
+		// Upper layer
 		CurrentLayer = StartingLayer + 1;
 		tiles = CurrentLayer->Tiles;
 		if (tiles != NULL) {
@@ -648,8 +648,8 @@ struct Map {
 			for(unsigned int y = 0; y < Height; ++y) {
 				for(unsigned int x = 0; x < Width; ++x) {
 					if (!Cells[x+y*Width].FixedTile) {
+						Cells[x+y*Width].TileID = empty_tile;
 						if (Cells[x+y*Width].GrowUp) {
-							Cells[x+y*Width].TileID = empty_tile;
 							Cells[x+y*Width].Ignore = false;
 						} else {
 							Cells[x+y*Width].Ignore = true;
@@ -660,7 +660,7 @@ struct Map {
 
 			for (unsigned int tries = 0 ; tries < 2; ++tries) {
 				SetupInitialTiles();
-				//if (AdjustTiles()) break;
+				if (AdjustTiles()) break;
 			}
 
 			for(unsigned int y = 0; y < Height; ++y) {
@@ -676,7 +676,7 @@ struct Map {
 
 		}
 
-		// Lower layers
+		// Lower layer
 		CurrentLayer = StartingLayer - 1;
 		tiles = CurrentLayer->Tiles;
 		if (tiles != NULL) {
@@ -686,8 +686,8 @@ struct Map {
 			for(unsigned int y = 0; y < Height; ++y) {
 				for(unsigned int x = 0; x < Width; ++x) {
 					if (!Cells[x+y*Width].FixedTile) {
+						Cells[x+y*Width].TileID = solid_tile;
 						if (Cells[x+y*Width].GrowDown) {
-							Cells[x+y*Width].TileID = empty_tile;
 							Cells[x+y*Width].Ignore = false;
 						} else {
 							Cells[x+y*Width].Ignore = true;
@@ -755,13 +755,13 @@ int main()
 	if (!tiles3.LoadTileImages("tiles/3"))
 		return EXIT_FAILURE;
 
-	MapLayer layers[] = { { &tiles1 , -2 }, { &tiles2 , 0 }, { &tiles3 , 2 }, { NULL , VERY_HIGH } };
+	MapLayer layers[] = { { NULL , VERY_LOW }, { &tiles1 , -4 }, { &tiles2 , 0 }, { &tiles3 , 8 }, { NULL , VERY_HIGH } };
 
 	Map map(32, 24, -100, 100);
 	map.SetLayers(layers);
 
 	map.Random();
-	map.SetStartingLayer(1);
+	map.SetStartingLayer(2);
 	map.AddTiles();
 
 	// Create the main rendering window
