@@ -110,9 +110,24 @@ struct Map {
 		};
 	};
 
-	bool AdjustTiles(unsigned int iterations = 250) {
+	void ResetMapCell(unsigned int x, unsigned int y) {
+		if (x < 0 || x > Width) return;
+		if (y < 0 || y > Height) return;
+		if (Cells[x+y*Width].FixedTile || Cells[x+y*Width].Ignore) return;
+
+		const TileSet * Tiles = CurrentLayer->Tiles;
+
+		if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
+			Cells[x+y*Width].TileID = Tiles->SolidTile();
+		} else {
+			Cells[x+y*Width].TileID = Tiles->EmptyTile();
+		}
+	}
+
+	bool AdjustTiles(unsigned int iterations = 300) {
 		const TileSet * Tiles = CurrentLayer->Tiles;
 		bool tiles_ok[Width * Height];
+		unsigned int wrong_resets = 0;
 		for (unsigned int k=0; k<iterations; ++k) {
 			unsigned int changes = 0;
 			unsigned int wrong = 0;
@@ -187,11 +202,7 @@ struct Map {
 							tiles_ok[x+y*Width] = false;
 							++wrong;
 							if (rand() % 100 <= 5) {
-								if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
-									Cells[x+y*Width].TileID = Tiles->SolidTile();
-								} else {
-									Cells[x+y*Width].TileID = Tiles->EmptyTile();
-								}
+								ResetMapCell(x, y);
 							}
 						} else {
 							tiles_ok[x+y*Width] = true;
@@ -203,15 +214,18 @@ struct Map {
 			if (wrong && !changes) {
 				for (unsigned int y=0; y<Height; ++y) {
 					for (unsigned int x=0; x<Width; ++x) {
-						if (!tiles_ok[x+y*Width] && !Cells[x+y*Width].FixedTile && !Cells[x+y*Width].Ignore) {
-							if (Cells[x+y*Width].Elevation >= CurrentLayer->Elevation) {
-								Cells[x+y*Width].TileID = Tiles->SolidTile();
-							} else {
-								Cells[x+y*Width].TileID = Tiles->EmptyTile();
+						if (!tiles_ok[x+y*Width]) {
+							ResetMapCell(x, y);
+							if (wrong_resets > 2) {
+								ResetMapCell(x-1, y);
+								ResetMapCell(x+1, y);
+								ResetMapCell(x, y-1);
+								ResetMapCell(x, y+1);
 							}
 						}
 					}
 				}
+				++wrong_resets;
 			}
 			if (!changes && !wrong) return true; // No wrong tiles
 		} // for (unsigned int k=0; k<iterations; ++k
@@ -439,7 +453,7 @@ int main()
 
 	MapLayer layers[] = { { NULL , VERY_LOW }, { &tiles1 , -4 }, { &tiles2 , 0 }, { &tiles3 , 8 }, { NULL , VERY_HIGH } };
 
-	Map map(32*2, 24*2, -100, 100);
+	Map map(32*5, 24*5, -100, 100);
 	map.SetLayers(layers);
 
 	map.Random();
