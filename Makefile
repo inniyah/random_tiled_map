@@ -14,6 +14,8 @@ CFLAGS= -O0 -g -Wall
 LDFLAGS= -Wl,-z,defs -Wl,--as-needed -Wl,--no-undefined
 LIBS=$(PKG_CONFIG_LIBS) -lsfml-graphics -lsfml-window -lsfml-system
 
+CFLAGS+=-std=c++11
+
 $(PROGRAM): $(OBJS)
 	g++ $(LDFLAGS) $+ -o $@ $(LIBS)
 

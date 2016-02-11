@@ -34,6 +34,7 @@
 #include <cstring>
 #include <cmath>
 #include <climits>
+#include <cstdint>
 #include <iostream>
 
 #define VERY_HIGH INT_MAX
@@ -440,15 +441,15 @@ int main()
 	srand((unsigned)time(0));
 
 	TileSet tiles1;
-	if (!tiles1.LoadTileImages("tiles/1"))
+	if (!tiles1.LoadTileTextures("tiles/1"))
 		return EXIT_FAILURE;
 
 	TileSet tiles2;
-	if (!tiles2.LoadTileImages("tiles/2"))
+	if (!tiles2.LoadTileTextures("tiles/2"))
 		return EXIT_FAILURE;
 
 	TileSet tiles3;
-	if (!tiles3.LoadTileImages("tiles/3"))
+	if (!tiles3.LoadTileTextures("tiles/3"))
 		return EXIT_FAILURE;
 
 	MapLayer layers[] = { { NULL , VERY_LOW }, { &tiles1 , -4 }, { &tiles2 , 0 }, { &tiles3 , 8 }, { NULL , VERY_HIGH } };
@@ -463,92 +464,95 @@ int main()
 	// Create the main rendering window
 	sf::RenderWindow app(sf::VideoMode(1024, 768, 32), "SFML TileMap");
 
-	// Get a reference to the input manager associated to our window
-	const sf::Input& input = app.GetInput();
-
 	signed int OffsetX = 0;
 	signed int OffsetY = 0;
 
 	// Start game loop
-	while (app.IsOpened()) {
+	while (app.isOpen()) {
 		sf::Event event;
-		while (app.GetEvent(event))
+		while (app.pollEvent(event))
 		{ // http://www.sfml-dev.org/tutorials/1.6/window-events.php
 
-			if (event.Type == sf::Event::Closed) { // Exit when the window is closed
-				app.Close();
+			if (event.type == sf::Event::Closed) { // Exit when the window is closed
+				app.close();
 			}
 
-			if (event.Type == sf::Event::Resized) {
+			if (event.type == sf::Event::Resized) {
 				//std::cout << "new width: " << event.Size.Width << std::endl;
 				//std::cout << "new height: " << event.Size.Height << std::endl;
 			}
 
-			if (event.Type == sf::Event::LostFocus) {
+			if (event.type == sf::Event::LostFocus) {
 				//std::cout << "lost focus" << std::endl;
 			}
 
-			if (event.Type == sf::Event::GainedFocus) {
+			if (event.type == sf::Event::GainedFocus) {
 				//std::cout << "gained focus" << std::endl;
 			}
 
-			if (event.Type == sf::Event::TextEntered) {
-				if (event.Text.Unicode < 128) {
-					//std::cout << "ASCII character typed: " << static_cast<char>(event.Text.Unicode) << std::endl;
+			if (event.type == sf::Event::TextEntered) {
+				if (event.text.unicode < 128) {
+					//std::cout << "ASCII character typed: " << static_cast<char>(event.text.unicode) << std::endl;
 				}
 			}
 
-			if (event.Type == sf::Event::KeyPressed) {
-				if (event.Key.Code == sf::Key::Escape) {
+			if (event.type == sf::Event::KeyPressed) {
+				if (event.key.code == sf::Keyboard::Escape) {
 					//std::cout << "the escape key was pressed" << std::endl;
-					//std::cout << "control:" << event.Key.Control << std::endl;
-					//std::cout << "alt:" << event.Key.Alt << std::endl;
-					//std::cout << "shift:" << event.Key.Shift << std::endl;
-					////std::cout << "system:" << event.Key.System << std::endl;
+					//std::cout << "control:" << event.key.control << std::endl;
+					//std::cout << "alt:" << event.key.alt << std::endl;
+					//std::cout << "shift:" << event.key.shift << std::endl;
+					//std::cout << "system:" << event.key.system << std::endl;
 				}
 			}
 
-			if (event.Type == sf::Event::MouseWheelMoved) {
-				//std::cout << "wheel movement: " << event.MouseWheel.Delta << std::endl;
-				////std::cout << "mouse x: " << event.MouseWheel.X << std::endl;
-				////std::cout << "mouse y: " << event.MouseWheel.Y << std::endl;
+			if (event.type == sf::Event::MouseWheelMoved) {
+				//std::cout << "wheel movement: " << event.mouseWheel.delta << std::endl;
+				//std::cout << "mouse x: " << event.mouseWheel.x << std::endl;
+				//std::cout << "mouse y: " << event.mouseWheel.y << std::endl;
 			}
 
-			if (event.Type == sf::Event::MouseButtonPressed) {
-				if (event.MouseButton.Button == sf::Mouse::Right) {
+			if (event.type == sf::Event::MouseButtonPressed) {
+				if (event.mouseButton.button == sf::Mouse::Right) {
 					//std::cout << "the right button was pressed" << std::endl;
-					//std::cout << "mouse x: " << event.MouseButton.X << std::endl;
-					//std::cout << "mouse y: " << event.MouseButton.Y << std::endl;
+					//std::cout << "mouse x: " << event.mouseButton.x << std::endl;
+					//std::cout << "mouse y: " << event.mouseButton.y << std::endl;
 				}
 			}
 
-			if (event.Type == sf::Event::MouseMoved) {
-				//std::cout << "new mouse x: " << event.MouseMove.X << std::endl;
-				//std::cout << "new mouse y: " << event.MouseMove.Y << std::endl;
+			if (event.type == sf::Event::MouseMoved) {
+				//std::cout << "new mouse x: " << event.mouseMove.x << std::endl;
+				//std::cout << "new mouse y: " << event.mouseMove.y << std::endl;
 			}
 
-			if (event.Type == sf::Event::MouseEntered) {
+			if (event.type == sf::Event::MouseEntered) {
 				//std::cout << "the mouse cursor has entered the window" << std::endl;
 			}
 
-			if (event.Type == sf::Event::MouseLeft) {
+			if (event.type == sf::Event::MouseLeft) {
 				//std::cout << "the mouse cursor has left the window" << std::endl;
 			}
 
-			if (event.Type == sf::Event::JoyMoved) {
-				if (event.JoyMove.Axis == sf::Joy::AxisX) {
+			if (event.type == sf::Event::JoystickButtonPressed) {
+				//std::cout << "joystick button pressed!" << std::endl;
+				//std::cout << "joystick id: " << event.joystickButton.joystickId << std::endl;
+				//std::cout << "button: " << event.joystickButton.button << std::endl;
+			}
+
+			if (event.type == sf::Event::JoystickMoved) {
+				if (event.joystickMove.axis == sf::Joystick::X) {
 					//std::cout << "X axis moved!" << std::endl;
-					//std::cout << "joystick id: " << event.JoyMove.JoystickId << std::endl;
-					//std::cout << "new position: " << event.JoyMove.Position << std::endl;
+					//std::cout << "joystick id: " << event.joystickMove.joystickId << std::endl;
+					//std::cout << "new position: " << event.joystickMove.position << std::endl;
 				}
 			}
 
 		}
 
-		bool LeftKeyDown  = input.IsKeyDown(sf::Key::Left);
-		bool RightKeyDown = input.IsKeyDown(sf::Key::Right);
-		bool UpKeyDown    = input.IsKeyDown(sf::Key::Up);
-		bool DownKeyDown  = input.IsKeyDown(sf::Key::Down);
+		bool LeftKeyDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+		bool RightKeyDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+		bool UpKeyDown    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+		bool DownKeyDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
 
 		if (LeftKeyDown) OffsetX -= 16;
 		if (RightKeyDown) OffsetX += 16;
@@ -556,17 +560,16 @@ int main()
 		if (DownKeyDown) OffsetY += 16;
 
 		// Clear screen
-		app.Clear();
+		app.clear();
 
 		// Get screen dimensions
-		unsigned int screen_height = app.GetHeight();
-		unsigned int screen_width = app.GetWidth();
+		sf::Vector2u screen_size = app.getSize();
 
 		// Draw only the part of map shown in screen
 		unsigned int start_y = (OffsetY > 0 ? OffsetY : 0) / 32 + 1;
-		unsigned int end_y = (OffsetY + screen_height) / 32 - 1;
+		unsigned int end_y = (OffsetY + screen_size.y) / 32 - 1;
 		unsigned int start_x = (OffsetX > 0 ? OffsetX : 0) / 32 + 1;
-		unsigned int end_x = (OffsetX + screen_width) / 32 - 1;
+		unsigned int end_x = (OffsetX + screen_size.x) / 32 - 1;
 
 		// Careful with the limits of the map
 		start_y = start_y > 0 ? start_y : 0;
@@ -578,19 +581,18 @@ int main()
 			for (unsigned int x=start_x; x<end_x; ++x) {
 				// Get the tile's image and sprite
 				sf::Sprite & sprite = map.Cells[x+y*map.getWidth()].TileRuntimeData->Sprite;
-				const sf::Image & image = *sprite.GetImage();
+				const sf::Texture & texture = *sprite.getTexture();
 				// Get the width and height of the image
-				int width = image.GetWidth();
-				int height = image.GetHeight();
+				sf::Vector2u size = texture.getSize();
 				// Adjust the offset by using the width
-				sprite.SetPosition(x * width - OffsetX, y * height - OffsetY);
+				sprite.setPosition(x * size.x - OffsetX, y * size.y - OffsetY);
 				// Draw the tile
-				app.Draw(sprite);
+				app.draw(sprite);
 			}
 		}
 
 		// Display window contents on screen
-		app.Display();
+		app.display();
 
 //		sf::Sleep(1.0f / 60.0f);
 	}

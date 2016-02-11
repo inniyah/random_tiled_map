@@ -42,7 +42,7 @@ public:
 	};
 
 	struct TileRuntime {
-		sf::Image Image;
+		sf::Texture Texture;
 		sf::Sprite Sprite;
 	};
 
@@ -77,7 +77,7 @@ public:
 	virtual unsigned int InitialTileGuess(uint32_t env) const = 0;
 
 	// Load the sprite images and create the sprites
-	bool LoadTileImages(const char * base_dir);
+	bool LoadTileTextures(const char * base_dir);
 
 	inline unsigned int NumTiles() const {
 		return NumberOfTiles;
@@ -109,8 +109,8 @@ public:
 	inline TileRuntime & GetTileRuntimeData(unsigned int index) {
 		return TileRuntimeData[index];
 	}
-	inline sf::Image & GetImage(unsigned int index) {
-		return TileRuntimeData[index].Image;
+	inline sf::Texture & GetTexture(unsigned int index) {
+		return TileRuntimeData[index].Texture;
 	}
 	inline sf::Sprite & GetSprite(unsigned int index) {
 		return TileRuntimeData[index].Sprite;

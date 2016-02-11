@@ -34,16 +34,16 @@
 #include <cmath>
 #include <climits>
 
-bool ITileSet::LoadTileImages(const char * base_dir) {
+bool ITileSet::LoadTileTextures(const char * base_dir) {
 	for (unsigned int i = 0; i < NumTiles(); ++i) {
 		char filename[32];
 		snprintf(filename, sizeof(filename), "%s/%s", base_dir, BaseFileName(i));
 		printf("Loading '%s'\n", filename);
-		if (!TileRuntimeData[i].Image.LoadFromFile(filename)) {
+		if (!TileRuntimeData[i].Texture.loadFromFile(filename)) {
 			return false;
 		}
-		TileRuntimeData[i].Image.SetSmooth(false);
-		TileRuntimeData[i].Sprite = sf::Sprite(TileRuntimeData[i].Image);
+		TileRuntimeData[i].Texture.setSmooth(false);
+		TileRuntimeData[i].Sprite = sf::Sprite(TileRuntimeData[i].Texture);
 	}
 	return true;
 }
