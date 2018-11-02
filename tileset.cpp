@@ -109,8 +109,8 @@ const TileSet::TileConfig TileSet::TileData_Config[] = {
 	{ "G14.png", BER+BED+BEU,        EMPTY,       ECOR_LEFTN,  HCOR_DOWNN,  EMPTY       ,  15 }, // 49
 	{ "G15.png", BED+BEL+BER,        HCOR_RIGHTN, EMPTY,       EMPTY,       ECOR_UPN    ,  15 }, // 50
 	{ "G16.png", BED+BEL+BER,        HCOR_LEFTN,  EMPTY,       ECOR_UPN,    EMPTY       ,  15 }, // 51
-	{ "G17.png", BEL+BEU+BED,        EMPTY,       HCOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 }, // 52
-	{ "G18.png", BEL+BEU+BED,        HCOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 }, // 53
+	{ "G17.png", BEL+BEU+BED,        EMPTY,       ECOR_RIGHTN, EMPTY,       SCOR_DOWNN  ,  15 }, // 52
+	{ "G18.png", BEL+BEU+BED,        ECOR_RIGHTN, EMPTY,       EMPTY,       SCOR_UPN    ,  15 }, // 53
 	{ "G21.png", BSU+BSR+BSL,        SOLID,       OCOR_LEFTN,  SCOR_DOWNN,  SOLID       ,  85 }, // 54
 	{ "G22.png", BSU+BSR+BSL,        SOLID,       OCOR_RIGHTN, SOLID,       SCOR_DOWNN  ,  85 }, // 55
 	{ "G23.png", BSR+BSD+BSU,        SCOR_LEFTN,  SOLID,       OCOR_UPN,    SOLID       ,  85 }, // 56
